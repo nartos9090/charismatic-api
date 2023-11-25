@@ -1,0 +1,11 @@
+package helpers_response
+
+import helpers_pagination "go-api-echo/internal/pkg/helpers/pagination"
+
+type HttpRes struct {
+	Status                         int         `json:"status"`
+	Message                        string      `json:"message"`
+	Data                           interface{} `json:"data"`
+	Errors                         []string    `json:"errors,omitempty"`
+	*helpers_pagination.Pagination `json:"meta,omitempty"`
+}
