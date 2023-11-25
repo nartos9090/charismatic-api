@@ -2,8 +2,8 @@ package infra
 
 import (
 	"context"
-	errors "go-api-echo/internal/pkg/helpers/errors"
-	adapter "go-api-echo/internal/services/auth/adapter"
+	"go-api-echo/internal/pkg/helpers/errors"
+	"go-api-echo/internal/services/auth/adapter"
 
 	"github.com/jmoiron/sqlx"
 )
@@ -11,37 +11,6 @@ import (
 type AuthRepo struct {
 	ctx context.Context
 	db  *sqlx.DB
-	tx  *sqlx.Tx
-}
-
-func (r *AuthRepo) BeginTransaction() *errors.Error {
-	tx, err := r.db.Beginx()
-	if err != nil {
-		sqlErr := errors.FromSql(err)
-		sqlErr.AddError(`error starting transaction`)
-
-		return &sqlErr
-	}
-
-	r.tx = tx
-
-	return nil
-}
-
-func (r AuthRepo) CommitTransaction() *errors.Error {
-	err := r.tx.Commit()
-	if err != nil {
-		sqlErr := errors.FromSql(err)
-		sqlErr.AddError(`error committing transaction`)
-
-		return &sqlErr
-	}
-
-	return nil
-}
-
-func (r AuthRepo) RollbackTransaction() {
-	_ = r.tx.Rollback()
 }
 
 func (r AuthRepo) GetAdminProfile(email string) (*adapter.Admin, *errors.Error) {
