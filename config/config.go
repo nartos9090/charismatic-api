@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"log"
 	"os"
 
@@ -8,9 +9,15 @@ import (
 )
 
 type (
+	SQLiteConf struct {
+		DataSourceName string
+	}
+
 	Env struct {
 		HttpPort  string
 		JWTSecret string
+
+		SQLite SQLiteConf
 	}
 )
 
@@ -32,4 +39,11 @@ func InitConfig() {
 	if !ok {
 		panic(`JWT_SECRET env not set`)
 	}
+
+	GlobalEnv.SQLite.DataSourceName, ok = os.LookupEnv(`SQLITE_DSN`)
+	if !ok {
+		panic(`SQLITE_DSN env not set`)
+	}
+
+	fmt.Print(":: Config loaded\n")
 }

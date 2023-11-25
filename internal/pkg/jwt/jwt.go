@@ -12,26 +12,26 @@ import (
 )
 
 type TokenData struct {
-	ID      int     `json:"id"`
-	Name    string  `json:"name"`
-	Picture *string `json:"picture"`
-	Role    string  `json:"role"`
+	ID       int     `json:"id"`
+	FullName string  `json:"fullName"`
+	Picture  *string `json:"picture"`
+	Role     string  `json:"role"`
 }
 
 type JwtClaims struct {
-	ID      int     `json:"id"`
-	Name    string  `json:"name"`
-	Picture *string `json:"picture"`
-	Role    string  `json:"role"`
+	ID       int     `json:"id"`
+	FullName string  `json:"fullName"`
+	Picture  *string `json:"picture"`
+	Role     string  `json:"role"`
 	jwt.StandardClaims
 }
 
 func GenerateJWT(data TokenData) (string, *errors.Error) {
 	claims := &JwtClaims{
-		ID:      data.ID,
-		Name:    data.Name,
-		Picture: data.Picture,
-		Role:    data.Role,
+		ID:       data.ID,
+		FullName: data.FullName,
+		Picture:  data.Picture,
+		Role:     data.Role,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(time.Hour * 72).Unix(),
 		},

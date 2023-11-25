@@ -6,6 +6,8 @@ import (
 
 	echojwt "github.com/labstack/echo-jwt/v4"
 	"github.com/labstack/echo/v4"
+
+	auth_infra "go-api-echo/internal/services/auth/infra"
 )
 
 func InitServer(port string) {
@@ -16,6 +18,7 @@ func InitServer(port string) {
 
 	routes := e.Group("/v1")
 	// Public routes goes here
+	auth_infra.AuthRoute(routes)
 
 	private := routes.Group("")
 	private.Use(echojwt.JWT([]byte(config.GlobalEnv.JWTSecret)))
