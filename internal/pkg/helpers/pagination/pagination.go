@@ -1,4 +1,4 @@
-package helpers_pagination
+package pagination
 
 func (v *Pagination) Parse() {
 	if v.Limit < 0 {

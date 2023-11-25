@@ -1,4 +1,4 @@
-package helpers_errors
+package errors
 
 import "net/http"
 

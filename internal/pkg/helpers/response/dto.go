@@ -1,4 +1,4 @@
-package helpers_response
+package response
 
 import helpers_pagination "go-api-echo/internal/pkg/helpers/pagination"
 

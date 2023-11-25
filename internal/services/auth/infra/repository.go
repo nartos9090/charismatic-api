@@ -1,4 +1,4 @@
-package auth_infra
+package infra
 
 import (
 	"context"

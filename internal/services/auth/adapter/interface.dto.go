@@ -1,4 +1,4 @@
-package auth_adapter
+package adapter
 
 import errors "go-api-echo/internal/pkg/helpers/errors"
 

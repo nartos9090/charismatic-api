@@ -1,4 +1,4 @@
-package auth_adapter
+package adapter
 
 import (
 	"go-api-echo/internal/pkg/crypto"

@@ -1,4 +1,4 @@
-package helpers_pagination
+package pagination
 
 type Pagination struct {
 	Page   int `query:"page" json:"page" db:"page"`
