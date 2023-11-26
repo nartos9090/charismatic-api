@@ -6,40 +6,36 @@ import (
 	"log"
 	"time"
 
-	"github.com/golang-jwt/jwt"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/labstack/echo/v4"
 	_ "github.com/labstack/echo/v4/middleware"
 )
 
 type TokenData struct {
-	ID       int     `json:"id"`
-	FullName string  `json:"fullName"`
-	Picture  *string `json:"picture"`
-	Role     string  `json:"role"`
+	ID       int    `json:"id"`
+	FullName string `json:"fullname"`
+	Role     string `json:"role"`
 }
 
 type JwtClaims struct {
-	ID       int     `json:"id"`
-	FullName string  `json:"fullName"`
-	Picture  *string `json:"picture"`
-	Role     string  `json:"role"`
-	jwt.StandardClaims
+	ID       int    `json:"id"`
+	FullName string `json:"fullname"`
+	Role     string `json:"role"`
+	jwt.RegisteredClaims
 }
 
 func GenerateJWT(data TokenData) (string, *errors.Error) {
 	claims := &JwtClaims{
 		ID:       data.ID,
 		FullName: data.FullName,
-		Picture:  data.Picture,
 		Role:     data.Role,
-		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: time.Now().Add(time.Hour * 72).Unix(),
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * 72)),
 		},
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	t, err := token.SignedString([]byte(config.GlobalEnv.JWTSecret))
-
 	if err != nil {
 		log.Print(err.Error())
 		return ``, errors.InternalServerError
@@ -49,7 +45,7 @@ func GenerateJWT(data TokenData) (string, *errors.Error) {
 }
 
 func Authorize(c echo.Context, roles ...string) *JwtClaims {
-	user := c.Get(`user`).(*jwt.Token)
+	user := c.Get("user").(*jwt.Token)
 	claims := user.Claims.(*JwtClaims)
 
 	if claims.ID == 0 {

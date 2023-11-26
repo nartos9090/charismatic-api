@@ -23,6 +23,7 @@ func HandleLogin(req LoginReq, repo AuthRepoInterface) (resp response.HttpRes) {
 	tokenData := jwt.TokenData{
 		ID:       admin.ID,
 		FullName: admin.FullName,
+		Role:     "admin",
 	}
 
 	token, err := jwt.GenerateJWT(tokenData)

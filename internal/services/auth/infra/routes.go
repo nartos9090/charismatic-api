@@ -2,6 +2,7 @@ package infra
 
 import (
 	"context"
+	"fmt"
 	"go-api-echo/internal/pkg/db/sqlite"
 	"go-api-echo/internal/pkg/validator"
 	adapter "go-api-echo/internal/services/auth/adapter"
@@ -14,6 +15,7 @@ var CONTEXT_TIMEOUT = 15 * time.Second
 
 func AuthRoute(g *echo.Group) {
 	r := g.Group(`/auth`)
+	defer fmt.Printf(":: Route /auth created\n")
 
 	r.POST(`/login`, func(c echo.Context) error {
 		var req adapter.LoginReq
