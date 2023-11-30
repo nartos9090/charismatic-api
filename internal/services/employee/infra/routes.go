@@ -64,7 +64,7 @@ func EmployeeRoute(g *echo.Group) {
 			db:  sqlite.Db,
 		}
 
-		resp := adapter.HandleDetailemployee(id, &repo)
+		resp := adapter.HandleDetailEmployee(id, &repo)
 		return c.JSON(resp.Status, resp)
 	})
 
@@ -142,6 +142,56 @@ func EmployeeRoute(g *echo.Group) {
 		}
 
 		resp := adapter.HandleDeleteEmployee(id, &repo)
+		return c.JSON(resp.Status, resp)
+	})
+
+	r.GET("/:id/leave-submission", func(c echo.Context) error {
+		admin := jwt.Authorize(c)
+		if admin == nil {
+			return nil
+		}
+
+		rawId := c.Param("id")
+		id, _ := strconv.Atoi(rawId)
+
+		timeout := 15 * time.Second
+		ctx, cancel := context.WithTimeout(context.Background(), timeout)
+
+		defer cancel()
+
+		repo := EmployeeRepo{
+			ctx: ctx,
+			db:  sqlite.Db,
+		}
+
+		resp := adapter.HandleListEmployeeLeave(id, &repo)
+		return c.JSON(resp.Status, resp)
+	})
+
+	r.POST("/:id/leave-submission", func(c echo.Context) error {
+		admin := jwt.Authorize(c)
+		if admin == nil {
+			return nil
+		}
+
+		var req adapter.LeaveSubmissionReq
+		_ = c.Bind(&req)
+		if err := validator.Validate(req); err != nil {
+			resp := err.ToHttpRes()
+			return c.JSON(resp.Status, resp)
+		}
+
+		timeout := 15 * time.Second
+		ctx, cancel := context.WithTimeout(context.Background(), timeout)
+
+		defer cancel()
+
+		repo := EmployeeRepo{
+			ctx: ctx,
+			db:  sqlite.Db,
+		}
+
+		resp := adapter.HandleSubmitLeave(req, &repo)
 		return c.JSON(resp.Status, resp)
 	})
 }

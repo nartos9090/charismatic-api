@@ -4,6 +4,7 @@ import (
 	"context"
 	"go-api-echo/internal/pkg/helpers/errors"
 	"go-api-echo/internal/services/employee/adapter"
+	"go-api-echo/internal/services/employee/entity"
 
 	"github.com/jmoiron/sqlx"
 )
@@ -230,4 +231,55 @@ func (r EmployeeRepo) DeleteEmployeeTx(id int) (int, *errors.Error) {
 	}
 
 	return int(rowsAffected), nil
+}
+
+func (r EmployeeRepo) ListEmployeeLeave(id int) (*[]string, *errors.Error) {
+	leaveDates := make([]string, 0)
+	err := r.db.SelectContext(
+		r.ctx,
+		&leaveDates,
+		`
+		SELECT
+			e.leaveDate
+		FROM employee_leave_submissions e
+		WHERE e.employeeId = ?
+		ORDER BY e.leaveDate ASC
+		`,
+		id,
+	)
+	if err != nil {
+		sqlErr := errors.FromSql(err)
+		sqlErr.AddError(`error querying employee list`)
+
+		return &leaveDates, &sqlErr
+	}
+
+	return &leaveDates, nil
+}
+
+func (r EmployeeRepo) SubmitEmployeeLeave(req *[]entity.LeaveSubmission) (int, error) {
+	res, err := r.db.NamedExecContext(
+		r.ctx,
+		`
+		INSERT INTO employee_leave_submissions
+		(
+			employeeId,
+			leaveDate
+		) VALUES (
+			:id,
+			:date
+		)
+		`,
+		*req,
+	)
+	if err != nil {
+		return 0, err
+	}
+
+	lastInsertedId, err := res.LastInsertId()
+	if err != nil {
+		return 0, err
+	}
+
+	return int(lastInsertedId), nil
 }

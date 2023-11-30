@@ -13,4 +13,9 @@ type (
 		FullName   string `json:"fullname" form:"fullname" db:"fullname"`
 		LeaveQuota int    `json:"leaveQuota" form:"leaveQuota" db:"leavequota"`
 	}
+
+	LeaveSubmissionReq struct {
+		ID    int      `param:"id" db:"id"`
+		Dates []string `json:"dates" form:"dates" db:"dates"`
+	}
 )
