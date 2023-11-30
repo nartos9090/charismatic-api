@@ -6,7 +6,6 @@ func (v *Pagination) Parse() {
 	} else if v.Limit == 0 {
 		v.Limit = 10
 	}
-
 	if v.Page <= 0 {
 		v.Page = 1
 	}

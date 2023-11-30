@@ -13,7 +13,6 @@ func (a SortDate) Less(i, j int) bool { return a[i] < a[j] }
 
 func TransformLeaveSubmissionRequest(rawReq LeaveSubmissionReq) *[]entity.LeaveSubmission {
 	req := make([]entity.LeaveSubmission, 0)
-
 	sort.Sort(SortDate(rawReq.Dates))
 
 	for _, date := range rawReq.Dates {

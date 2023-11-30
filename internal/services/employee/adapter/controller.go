@@ -141,7 +141,6 @@ func HandleSubmitLeave(rawReq LeaveSubmissionReq, repo LeaveSubmissionRepoInterf
 	}
 
 	req := TransformLeaveSubmissionRequest(rawReq)
-
 	res, rawErr := usecase.ProcessLeaveSubmission(req, repo.SubmitEmployeeLeave)
 	if rawErr != nil {
 		err := errors.InternalServerError

@@ -20,6 +20,7 @@ func AuthRoute(g *echo.Group) {
 	r.POST(`/login`, func(c echo.Context) error {
 		var req adapter.LoginReq
 		_ = c.Bind(&req)
+
 		if err := validator.Validate(req); err != nil {
 			resp := err.ToHttpRes()
 			return c.JSON(resp.Status, resp)
@@ -34,8 +35,8 @@ func AuthRoute(g *echo.Group) {
 			ctx: ctx,
 			db:  sqlite.Db,
 		}
-
 		resp := adapter.HandleLogin(req, repo)
+
 		return c.JSON(resp.Status, resp)
 	})
 }

@@ -10,8 +10,8 @@ import (
 func GenerateTemporaryPin(n int) string {
 	s := rand.NewSource(time.Now().UTC().UnixNano())
 	r := rand.New(s)
-
 	base := 1
+
 	for i := 1; i < n; i++ {
 		base *= 10
 	}

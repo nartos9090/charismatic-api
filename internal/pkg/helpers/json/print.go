@@ -10,5 +10,6 @@ func Print(v interface{}) {
 	if err != nil {
 		panic(err)
 	}
+
 	fmt.Println(string(b))
 }

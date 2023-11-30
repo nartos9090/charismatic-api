@@ -11,7 +11,6 @@ func FromSql(err error) Error {
 	log.Print(err)
 
 	sqlErr, ok := err.(*mysql.MySQLError)
-
 	if !ok {
 		switch err {
 		case sql.ErrNoRows:

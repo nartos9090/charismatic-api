@@ -7,5 +7,6 @@ func ConvertNumberToAlphabet(n int) string {
 		result = string(rune('A'+mod)) + result
 		n = (n - mod) / 26
 	}
+
 	return result
 }

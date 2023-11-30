@@ -35,10 +35,12 @@ func Validate(typeStruct interface{}) *errors.Error {
 	err := ValidateStruct(typeStruct)
 	if err != nil {
 		errRes := *errors.BadRequestError
+
 		for _, v := range err {
 			errMsg := fmt.Sprintf(`field %s must be type of %s, invalid value of %s`, v.FailedField, v.Tag, v.Value)
 			errRes.Errors = append(errRes.Errors, errMsg)
 		}
+
 		return &errRes
 	}
 

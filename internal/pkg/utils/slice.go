@@ -55,9 +55,7 @@ func IntToCharStr(i int) string {
 
 func Prepend[T any](slice []T, val T) []T {
 	slice = append(slice, val)
-
 	copy(slice[1:], slice)
-
 	slice[0] = val
 
 	return slice

@@ -15,7 +15,6 @@ type AuthRepo struct {
 
 func (r AuthRepo) GetAdminProfile(email string) (*adapter.Admin, *errors.Error) {
 	admin := adapter.Admin{}
-
 	err := r.db.GetContext(
 		r.ctx,
 		&admin,

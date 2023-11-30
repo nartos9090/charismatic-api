@@ -13,7 +13,6 @@ func HandleLogin(req LoginReq, repo AuthRepoInterface) (resp response.HttpRes) {
 	if err != nil {
 		return err.ToHttpRes()
 	}
-
 	if ok := crypto.Match(req.Password, admin.Password, admin.PasswordSalt); !ok {
 		err := *errors.UnauthorizedError
 		err.AddError(`invalid credential`)
@@ -25,7 +24,6 @@ func HandleLogin(req LoginReq, repo AuthRepoInterface) (resp response.HttpRes) {
 		FullName: admin.FullName,
 		Role:     "admin",
 	}
-
 	token, err := jwt.GenerateJWT(tokenData)
 	if err != nil {
 		return err.ToHttpRes()

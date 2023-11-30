@@ -33,7 +33,6 @@ func GenerateJWT(data TokenData) (string, *errors.Error) {
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * 72)),
 		},
 	}
-
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	t, err := token.SignedString([]byte(config.GlobalEnv.JWTSecret))
 	if err != nil {
@@ -53,9 +52,9 @@ func Authorize(c echo.Context, roles ...string) *JwtClaims {
 		c.JSON(resp.Status, resp)
 		return nil
 	}
-
 	if len(roles) > 0 {
 		authenticated := false
+
 		for _, role := range roles {
 			if role == claims.Role {
 				authenticated = true

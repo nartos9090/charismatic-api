@@ -22,7 +22,6 @@ func GenerateRSAKey() RSAKeyPair {
 	}
 
 	publicKey := &privateKey.PublicKey
-
 	private := privateRSAToString(privateKey)
 	public := publicRSAToString(publicKey)
 
@@ -85,7 +84,6 @@ func EncryptWithPublicKey(id string, pub string) string {
 	hash := sha512.New()
 	publicKey := stringToPublicRSA(pub)
 	msg := []byte(id)
-
 	cipher, err := rsa.EncryptOAEP(hash, rand.Reader, publicKey, msg, nil)
 	if err != nil {
 		panic(err)
@@ -97,7 +95,6 @@ func DecryptWithPrivateKey(data string, pri string) string {
 	hash := sha512.New()
 	privateKey := stringToPrivateRSA(pri)
 	cipher := []byte(data)
-
 	plain, err := rsa.DecryptOAEP(hash, rand.Reader, privateKey, cipher, nil)
 	if err != nil {
 		panic(err)
