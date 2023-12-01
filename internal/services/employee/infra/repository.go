@@ -19,7 +19,7 @@ func (r *EmployeeRepo) BeginTransaction() *errors.Error {
 	tx, err := r.db.Beginx()
 	if err != nil {
 		sqlErr := errors.FromSql(err)
-		sqlErr.AddError(`error starting transaction`)
+		sqlErr.AddError("error starting transaction")
 
 		return &sqlErr
 	}
@@ -33,7 +33,7 @@ func (r EmployeeRepo) CommitTransaction() *errors.Error {
 	err := r.tx.Commit()
 	if err != nil {
 		sqlErr := errors.FromSql(err)
-		sqlErr.AddError(`error committing transaction`)
+		sqlErr.AddError("error committing transaction")
 
 		return &sqlErr
 	}
@@ -49,7 +49,7 @@ func (r EmployeeRepo) ListEmployeeTx(req *adapter.ListEmployeeReq) (*[]adapter.E
 	tx, err := r.db.Beginx()
 	if err != nil {
 		sqlErr := errors.FromSql(err)
-		sqlErr.AddError(`error starting transaction`)
+		sqlErr.AddError("error starting transaction")
 		return nil, &sqlErr
 	}
 
@@ -70,13 +70,13 @@ func (r EmployeeRepo) ListEmployeeTx(req *adapter.ListEmployeeReq) (*[]adapter.E
 		ORDER BY e.fullname ASC
 		LIMIT ? OFFSET ?
 		`,
-		`%`+req.Search+`%`,
+		"%"+req.Search+"%",
 		req.Pagination.Limit,
 		req.Pagination.Offset,
 	)
 	if err != nil {
 		sqlErr := errors.FromSql(err)
-		sqlErr.AddError(`error querying employee list`)
+		sqlErr.AddError("error querying employee list")
 		_ = tx.Rollback()
 
 		return &employees, &sqlErr
@@ -92,11 +92,11 @@ func (r EmployeeRepo) ListEmployeeTx(req *adapter.ListEmployeeReq) (*[]adapter.E
 		FROM employees e
 		WHERE e.fullname LIKE ?
 		`,
-		`%`+req.Search+`%`,
+		"%"+req.Search+"%",
 	)
 	if err != nil {
 		sqlErr := errors.FromSql(err)
-		sqlErr.AddError(`error querying total employee`)
+		sqlErr.AddError("error querying total employee")
 		_ = tx.Rollback()
 
 		return &employees, &sqlErr
@@ -107,7 +107,7 @@ func (r EmployeeRepo) ListEmployeeTx(req *adapter.ListEmployeeReq) (*[]adapter.E
 	err = tx.Commit()
 	if err != nil {
 		sqlErr := errors.FromSql(err)
-		sqlErr.AddError(`error committing transaction`)
+		sqlErr.AddError("error committing transaction")
 		_ = tx.Rollback()
 
 		return &employees, &sqlErr
@@ -136,7 +136,7 @@ func (r EmployeeRepo) DetailEmployee(id int) (*adapter.Employee, *errors.Error) 
 	)
 	if err != nil {
 		sqlErr := errors.FromSql(err)
-		sqlErr.AddError(`error querying employee detail`)
+		sqlErr.AddError("error querying employee detail")
 
 		return &employee, &sqlErr
 	}
@@ -161,7 +161,7 @@ func (r EmployeeRepo) InsertEmployee(req adapter.UpsertEmployeeReq) (int, *error
 	)
 	if err != nil {
 		sqlErr := errors.FromSql(err)
-		sqlErr.AddError(`error adding new employee`)
+		sqlErr.AddError("error adding new employee")
 
 		return 0, &sqlErr
 	}
@@ -169,7 +169,7 @@ func (r EmployeeRepo) InsertEmployee(req adapter.UpsertEmployeeReq) (int, *error
 	lastInsertedId, err := res.LastInsertId()
 	if err != nil {
 		sqlErr := errors.FromSql(err)
-		sqlErr.AddError(`error getting new employee id`)
+		sqlErr.AddError("error getting new employee id")
 
 		return 0, &sqlErr
 	}
@@ -190,7 +190,7 @@ func (r EmployeeRepo) UpdateEmployee(req adapter.UpsertEmployeeReq) (int, *error
 	)
 	if err != nil {
 		sqlErr := errors.FromSql(err)
-		sqlErr.AddError(`error updating employee`)
+		sqlErr.AddError("error updating employee")
 
 		return 0, &sqlErr
 	}
@@ -198,7 +198,7 @@ func (r EmployeeRepo) UpdateEmployee(req adapter.UpsertEmployeeReq) (int, *error
 	rowsAffected, err := res.RowsAffected()
 	if err != nil {
 		sqlErr := errors.FromSql(err)
-		sqlErr.AddError(`error getting affected rows after updating employee`)
+		sqlErr.AddError("error getting affected rows after updating employee")
 
 		return 0, &sqlErr
 	}
@@ -217,7 +217,7 @@ func (r EmployeeRepo) DeleteEmployeeTx(id int) (int, *errors.Error) {
 	)
 	if err != nil {
 		sqlErr := errors.FromSql(err)
-		sqlErr.AddError(`error deleting employee`)
+		sqlErr.AddError("error deleting employee")
 
 		return 0, &sqlErr
 	}
@@ -225,7 +225,7 @@ func (r EmployeeRepo) DeleteEmployeeTx(id int) (int, *errors.Error) {
 	rowsAffected, err := res.RowsAffected()
 	if err != nil {
 		sqlErr := errors.FromSql(err)
-		sqlErr.AddError(`error getting affected rows after deleting employee`)
+		sqlErr.AddError("error getting affected rows after deleting employee")
 
 		return 0, &sqlErr
 	}
@@ -249,7 +249,7 @@ func (r EmployeeRepo) ListEmployeeLeave(id int) (*[]string, *errors.Error) {
 	)
 	if err != nil {
 		sqlErr := errors.FromSql(err)
-		sqlErr.AddError(`error querying employee list`)
+		sqlErr.AddError("error querying employee list")
 
 		return &leaveDates, &sqlErr
 	}

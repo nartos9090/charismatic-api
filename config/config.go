@@ -25,24 +25,24 @@ var GlobalEnv Env
 
 func InitConfig() {
 	if err := godotenv.Load(); err != nil {
-		log.Panic(`Can't find .env`)
+		log.Panic("Can't find .env")
 	}
 
 	var ok bool
 
-	GlobalEnv.HttpPort, ok = os.LookupEnv(`HTTP_PORT`)
+	GlobalEnv.HttpPort, ok = os.LookupEnv("HTTP_PORT")
 	if !ok {
-		panic(`HTTP_PORT env not set`)
+		panic("HTTP_PORT env not set")
 	}
 
-	GlobalEnv.JWTSecret, ok = os.LookupEnv(`JWT_SECRET`)
+	GlobalEnv.JWTSecret, ok = os.LookupEnv("JWT_SECRET")
 	if !ok {
-		panic(`JWT_SECRET env not set`)
+		panic("JWT_SECRET env not set")
 	}
 
-	GlobalEnv.SQLite.DataSourceName, ok = os.LookupEnv(`SQLITE_DSN`)
+	GlobalEnv.SQLite.DataSourceName, ok = os.LookupEnv("SQLITE_DSN")
 	if !ok {
-		panic(`SQLITE_DSN env not set`)
+		panic("SQLITE_DSN env not set")
 	}
 
 	fmt.Print(":: Config loaded\n")

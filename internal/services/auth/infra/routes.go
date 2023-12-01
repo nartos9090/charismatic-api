@@ -14,10 +14,10 @@ import (
 var CONTEXT_TIMEOUT = 15 * time.Second
 
 func AuthRoute(g *echo.Group) {
-	r := g.Group(`/auth`)
+	r := g.Group("/auth")
 	defer fmt.Printf(":: Route /auth created\n")
 
-	r.POST(`/login`, func(c echo.Context) error {
+	r.POST("/login", func(c echo.Context) error {
 		var req adapter.LoginReq
 		_ = c.Bind(&req)
 

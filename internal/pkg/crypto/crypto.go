@@ -55,7 +55,7 @@ func TempPassword() *HashedPwd {
 	s := math_rand.NewSource(time.Now().UTC().UnixNano())
 	r := math_rand.New(s)
 	random := r.Intn(10_000)
-	pwd := fmt.Sprintf(`%04d`, random)
+	pwd := fmt.Sprintf("%04d", random)
 	var hashedPwd HashedPwd
 	hashedPwd.Raw = pwd
 	hashedPwd.Salt = generateRandomSalt(saltSize)

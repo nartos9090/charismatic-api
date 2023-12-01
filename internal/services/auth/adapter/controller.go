@@ -15,7 +15,7 @@ func HandleLogin(req LoginReq, repo AuthRepoInterface) (resp response.HttpRes) {
 	}
 	if ok := crypto.Match(req.Password, admin.Password, admin.PasswordSalt); !ok {
 		err := *errors.UnauthorizedError
-		err.AddError(`invalid credential`)
+		err.AddError("invalid credential")
 		return err.ToHttpRes()
 	}
 
@@ -34,7 +34,7 @@ func HandleLogin(req LoginReq, repo AuthRepoInterface) (resp response.HttpRes) {
 		TokenData: tokenData,
 	}
 	resp.Status = http.StatusOK
-	resp.Message = `login success`
+	resp.Message = "login success"
 
 	return
 }

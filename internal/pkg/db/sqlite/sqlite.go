@@ -9,7 +9,7 @@ import (
 )
 
 var Db *sqlx.DB
-var dbDriver = `sqlite3`
+var dbDriver = "sqlite3"
 
 func InitSqlite(cfg config.SQLiteConf) {
 	dsn := cfg.DataSourceName

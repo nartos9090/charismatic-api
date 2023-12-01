@@ -7,7 +7,7 @@ import (
 )
 
 func SliceToString[T any](slice []T) string {
-	return strings.Trim(strings.Join(strings.Split(fmt.Sprint(slice), ` `), `,`), `[]`)
+	return strings.Trim(strings.Join(strings.Split(fmt.Sprint(slice), " "), ","), "[]")
 }
 
 func StringToIntSlice(str string) []int {
@@ -15,7 +15,7 @@ func StringToIntSlice(str string) []int {
 		return make([]int, 0)
 	}
 
-	raw := strings.Split(str, `,`)
+	raw := strings.Split(str, ",")
 	res := make([]int, len(raw))
 
 	for i, v := range raw {
@@ -38,7 +38,7 @@ func SumIntSlice(slice []int) (res int) {
 }
 
 func StringToStringSlice(str string) (ret []string) {
-	raw := strings.Split(str, `,`)
+	raw := strings.Split(str, ",")
 
 	for _, v := range raw {
 		if len(v) > 0 {

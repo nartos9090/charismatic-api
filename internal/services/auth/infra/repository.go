@@ -32,7 +32,7 @@ func (r AuthRepo) GetAdminProfile(email string) (*adapter.Admin, *errors.Error) 
 	)
 	if err != nil {
 		sqlErr := errors.FromSql(err)
-		sqlErr.AddError(`error getting login info`)
+		sqlErr.AddError("error getting login info")
 
 		return nil, &sqlErr
 	}

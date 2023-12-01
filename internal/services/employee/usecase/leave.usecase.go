@@ -32,7 +32,7 @@ func checkSubmissionDayUntilLeaveDate(d string) error {
 		return fmt.Errorf("error parsing date while checking day before leave submission")
 	}
 
-	duration := int(time.Until(date).Hours() / 24)
+	duration := int(time.Until(date).Hours() / utils.HOURS_IN_DAY)
 
 	if duration < entity.MAX_SUBMISSION_DAY_BEFORE_LEAVE_DATE {
 		return fmt.Errorf(

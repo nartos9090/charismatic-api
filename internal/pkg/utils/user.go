@@ -17,6 +17,6 @@ func GenerateTemporaryPin(n int) string {
 	}
 
 	g := r.Intn(10*base-1) + base
-	res := fmt.Sprintf(`%0`+strconv.Itoa(n)+`d`, g)
+	res := fmt.Sprintf("%0"+strconv.Itoa(n)+"d", g)
 	return res
 }

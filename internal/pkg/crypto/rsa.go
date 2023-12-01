@@ -33,7 +33,7 @@ func GenerateRSAKey() RSAKeyPair {
 func privateRSAToString(private *rsa.PrivateKey) string {
 	var bytes []byte = x509.MarshalPKCS1PrivateKey(private)
 	block := &pem.Block{
-		Type:  `RSA PRIVATE KEY`,
+		Type:  "RSA PRIVATE KEY",
 		Bytes: bytes,
 	}
 	pem := pem.EncodeToMemory(block)
@@ -44,7 +44,7 @@ func privateRSAToString(private *rsa.PrivateKey) string {
 func publicRSAToString(public *rsa.PublicKey) string {
 	var bytes []byte = x509.MarshalPKCS1PublicKey(public)
 	block := &pem.Block{
-		Type:  `RSA PUBLIC KEY`,
+		Type:  "RSA PUBLIC KEY",
 		Bytes: bytes,
 	}
 	pem := pem.EncodeToMemory(block)
@@ -56,7 +56,7 @@ func publicRSAToString(public *rsa.PublicKey) string {
 func stringToPrivateRSA(private string) *rsa.PrivateKey {
 	block, _ := pem.Decode([]byte(private))
 	if block == nil {
-		panic(`failed to parse PEM block containing private key`)
+		panic("failed to parse PEM block containing private key")
 	}
 
 	key, err := x509.ParsePKCS1PrivateKey(block.Bytes)
@@ -69,7 +69,7 @@ func stringToPrivateRSA(private string) *rsa.PrivateKey {
 func stringToPublicRSA(public string) *rsa.PublicKey {
 	block, _ := pem.Decode([]byte(public))
 	if block == nil {
-		panic(`failed to parse PEM block containing public key`)
+		panic("failed to parse PEM block containing public key")
 	}
 
 	key, err := x509.ParsePKCS1PublicKey(block.Bytes)

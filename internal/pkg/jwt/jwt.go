@@ -37,7 +37,7 @@ func GenerateJWT(data TokenData) (string, *errors.Error) {
 	t, err := token.SignedString([]byte(config.GlobalEnv.JWTSecret))
 	if err != nil {
 		log.Print(err.Error())
-		return ``, errors.InternalServerError
+		return "", errors.InternalServerError
 	}
 
 	return t, nil

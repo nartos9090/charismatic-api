@@ -24,7 +24,7 @@ func SetField[T any](v any, name string, value T) *errors.Error {
 	rv := reflect.ValueOf(v)
 	if rv.Kind() != reflect.Ptr || rv.Elem().Kind() != reflect.Struct {
 		err := *errors.InternalServerError
-		err.AddError(`v must be a pointer to struct`)
+		err.AddError("v must be a pointer to struct")
 
 		return &err
 	}
