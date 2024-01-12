@@ -2,12 +2,12 @@ package gemini_service
 
 import (
 	"context"
+	"fmt"
 	"github.com/google/generative-ai-go/genai"
 	"go-api-echo/config"
 	"go-api-echo/internal/pkg/helpers/errors"
 	"google.golang.org/api/option"
 	"log"
-	"strconv"
 	"strings"
 )
 
@@ -35,8 +35,8 @@ func generatePrompt(req GenerateRequest) string {
 		"Target Pasar: " + req.MarketTarget + "\n\n" +
 		"Keunggulan: " + req.Superiority + "\n\n" +
 		// TODO: fix duration prompt
-		"Duration: " + strconv.Itoa(int(req.Duration/10)) + "\n\n" +
-		"Buat storyboard untuk membuat video iklan promosi produk dengan detail produk di atas. Buat narasi iklan yang menarik, dengan masing-masing perkiraan durasi 10 detik. Tambahkan judul ilustrasi gambar yang cocok. Gunakan format output sebagai berikut.\nAdegan:\nNarasi:\nIlustrasi gambar:"
+		//"Duration: " + strconv.Itoa(int(req.Duration/10)) + "\n\n" +
+		"Buat storyboard untuk membuat video iklan promosi produk dengan detail produk di atas. Buat narasi iklan yang menarik, dengan masing-masing perkiraan durasi 10 detik. Tambahkan judul ilustrasi gambar yang cocok. Gunakan format output sebagai berikut masing-masing dalam satu baris tanpa poin.\nJudul Adegan:\nTeks Narasi Iklan:\nTeks Ilustrasi Gambar:"
 }
 
 func Generate(req GenerateRequest) ([]Scene, *errors.Error) {
@@ -58,8 +58,25 @@ func Generate(req GenerateRequest) ([]Scene, *errors.Error) {
 		log.Fatal(err)
 	}
 
+	text := parseResponse(resp)
+	text = strings.Replace(text, "**", "", -1)
+
+	print(text)
+
 	// TODO: fix error
-	return parseScenes(resp.Text), nil
+	return parseScenes(text), nil
+}
+
+func parseResponse(resp *genai.GenerateContentResponse) (text string) {
+	for _, cand := range resp.Candidates {
+		if cand.Content != nil {
+			for _, part := range cand.Content.Parts {
+				text += fmt.Sprintf("%s", part)
+			}
+		}
+	}
+
+	return
 }
 
 func parseScenes(result string) []Scene {
@@ -70,20 +87,20 @@ func parseScenes(result string) []Scene {
 	sceneNumber := 0
 
 	for _, line := range lines {
-		if strings.HasPrefix(line, "**Adegan ") {
+		if strings.HasPrefix(line, "Judul Adegan: ") {
 			sceneNumber++
 			// TODO: trim
 			scene := Scene{
 				Order: sceneNumber,
-				Title: line,
+				Title: strings.Replace(line, "Judul Adegan: ", "", 1),
 			}
 			scenes = append(scenes, scene)
-		} else if strings.HasPrefix(line, "**Narasi**:") {
+		} else if strings.HasPrefix(line, "Teks Narasi Iklan: ") {
 			// TODO: trim
-			scenes[len(scenes)-1].Narration = strings.Replace(line, "**Narasi**:", "", 1)
-		} else if strings.HasPrefix(line, "**Ilustrasi gambar**:") {
+			scenes[len(scenes)-1].Narration = strings.Replace(line, "Teks Narasi Iklan: ", "", 1)
+		} else if strings.HasPrefix(line, "Teks Ilustrasi Gambar: ") {
 			// TODO: trim
-			scenes[len(scenes)-1].Narration = strings.Replace(line, "**Illustrasi gambar**:", "", 1)
+			scenes[len(scenes)-1].Narration = strings.Replace(line, "Teks Ilustrasi Gambar: ", "", 1)
 		}
 	}
 
