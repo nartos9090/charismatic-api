@@ -50,3 +50,16 @@ curl --location 'http://localhost:8000/v1/video/generate' \
 Import this collection
 
 https://api.postman.com/collections/9208271-d4d7f745-d119-4bab-a565-4017d1dffbf4?access_key=PMAT-01HKZ9NRZMZE9Y2JAR95MAPD84
+
+### Testing environment
+
+Create ```.env``` file in the root folder and fill with this configuration.
+
+```
+HTTP_PORT=127.0.0.1:8000
+JWT_SECRET=qwerty123
+
+DALLE_API_KEY=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
+ELEVENLABS_API_KEY=https://elevenlabs.io/docs/api-reference/text-to-speech
+GEMINI_API_KEY=AIzaSyAmjtCr0NQusUrodsQp28YHXbjW62_HsYI
+```
