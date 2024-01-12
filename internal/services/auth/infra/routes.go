@@ -3,12 +3,11 @@ package infra
 import (
 	"context"
 	"fmt"
+	"github.com/labstack/echo/v4"
 	"go-api-echo/internal/pkg/db/sqlite"
 	"go-api-echo/internal/pkg/validator"
 	adapter "go-api-echo/internal/services/auth/adapter"
 	"time"
-
-	"github.com/labstack/echo/v4"
 )
 
 var CONTEXT_TIMEOUT = 15 * time.Second

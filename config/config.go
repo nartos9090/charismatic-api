@@ -1,7 +1,6 @@
 package config
 
 import (
-	"fmt"
 	"log"
 	"os"
 
@@ -9,15 +8,25 @@ import (
 )
 
 type (
-	SQLiteConf struct {
-		DataSourceName string
+	GeminiConf struct {
+		ApiKey string
+	}
+
+	ElevenLabsConf struct {
+		ApiKey string
+	}
+
+	DalleConf struct {
+		ApiKey string
 	}
 
 	Env struct {
 		HttpPort  string
 		JWTSecret string
 
-		SQLite SQLiteConf
+		GeminiConf     GeminiConf
+		ElevenLabsConf ElevenLabsConf
+		DalleConf      DalleConf
 	}
 )
 
@@ -40,10 +49,18 @@ func InitConfig() {
 		panic("JWT_SECRET env not set")
 	}
 
-	GlobalEnv.SQLite.DataSourceName, ok = os.LookupEnv("SQLITE_DSN")
+	GlobalEnv.ElevenLabsConf.ApiKey, ok = os.LookupEnv("ELEVENLABS_API_KEY")
 	if !ok {
-		panic("SQLITE_DSN env not set")
+		panic("ELEVENLABS_API_KEY env not set")
 	}
 
-	fmt.Print(":: Config loaded\n")
+	GlobalEnv.DalleConf.ApiKey, ok = os.LookupEnv("DALLE_API_KEY")
+	if !ok {
+		panic("DALLE_API_KEY env not set")
+	}
+
+	GlobalEnv.GeminiConf.ApiKey, ok = os.LookupEnv("GEMINI_API_KEY")
+	if !ok {
+		panic("GEMINI_API_KEY env not set")
+	}
 }

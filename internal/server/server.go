@@ -2,18 +2,9 @@ package server
 
 import (
 	"fmt"
-	"go-api-echo/config"
-	"net/http"
-
-	"go-api-echo/internal/pkg/helpers/errors"
-	customjwt "go-api-echo/internal/pkg/jwt"
-
-	"github.com/golang-jwt/jwt/v5"
-	echojwt "github.com/labstack/echo-jwt/v4"
 	"github.com/labstack/echo/v4"
-
-	auth_infra "go-api-echo/internal/services/auth/infra"
-	employee_infra "go-api-echo/internal/services/employee/infra"
+	video_infra "go-api-echo/internal/services/video/infra"
+	"net/http"
 )
 
 func InitServer(port string) {
@@ -24,24 +15,7 @@ func InitServer(port string) {
 	})
 
 	routes := e.Group("/v1")
-	// Public routes goes here
-	auth_infra.AuthRoute(routes)
-
-	jwtConfig := echojwt.Config{
-		NewClaimsFunc: func(c echo.Context) jwt.Claims {
-			return new(customjwt.JwtClaims)
-		},
-		SigningKey: []byte(config.GlobalEnv.JWTSecret),
-		ErrorHandler: func(c echo.Context, err error) error {
-			res := errors.UnauthorizedError
-			res.Errors = append(res.Errors, err.Error())
-			return c.JSON(res.HttpCode, res.ToHttpRes())
-		},
-	}
-	private := routes.Group("")
-	private.Use(echojwt.WithConfig(jwtConfig))
-	// Private routes goes here
-	employee_infra.EmployeeRoute(private)
+	video_infra.VideoRoute(routes)
 
 	e.Logger.Fatal(e.Start(port))
 }
