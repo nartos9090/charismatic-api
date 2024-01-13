@@ -1,8 +1,8 @@
 package adapter
 
 import (
-	"fmt"
 	"go-api-echo/external/services/dalle_service"
+	"go-api-echo/external/services/elevenlabs_service"
 	"go-api-echo/external/services/gemini_service"
 	"go-api-echo/internal/pkg/helpers/response"
 	"net/http"
@@ -17,21 +17,28 @@ func GenerateVideo(req GenerateVideoReq) (resp response.HttpRes) {
 
 	var wg sync.WaitGroup
 
-	wg.Add(len(scenes))
+	wg.Add(len(scenes) * 2)
 
-	for i := range scenes {
-		go func(i int) {
+	for i, _scene := range scenes {
+		go func(i int, scene gemini_service.Scene) {
 			defer wg.Done()
-			fmt.Println(scenes[i].Illustration)
-			illustration, err := dalle_service.Generate(scenes[i].Illustration, dalle_service.GenerateSize1)
+			url, err := dalle_service.Generate(scene.Illustration, dalle_service.GenerateSize1)
 			if err != nil {
+				resp = err.ToHttpRes()
 				return
 			}
-			scenes[i].Illustration = illustration
+			scenes[i].IllustrationUrl = url
+		}(i, _scene)
 
-			//voice := elevenlabs_service.Generate(scene.Narration)
-			//scene.Voice = voice
-		}(i)
+		go func(i int, scene gemini_service.Scene) {
+			defer wg.Done()
+			voice, err := elevenlabs_service.Generate(scene.Narration)
+			if err != nil {
+				resp = err.ToHttpRes()
+				return
+			}
+			scenes[i].VoiceUrl = voice
+		}(i, _scene)
 	}
 
 	wg.Wait()

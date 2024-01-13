@@ -21,11 +21,13 @@ type GenerateRequest struct {
 }
 
 type Scene struct {
-	Order        int    `json:"order"`
-	Title        string `json:"title"`
-	Narration    string `json:"narration"`
-	Illustration string `json:"illustration"`
-	Voice        string `json:"voice"`
+	Order           int    `json:"order"`
+	Title           string `json:"title"`
+	Narration       string `json:"narration"`
+	Illustration    string `json:"illustration"`
+	IllustrationUrl string `json:"illustration_url"`
+	Voice           string `json:"voice"`
+	VoiceUrl        string `json:"voice_url"`
 }
 
 func generatePrompt(req GenerateRequest) string {
@@ -36,7 +38,7 @@ func generatePrompt(req GenerateRequest) string {
 		"Keunggulan: " + req.Superiority + "\n\n" +
 		// TODO: fix duration prompt
 		//"Duration: " + strconv.Itoa(int(req.Duration/10)) + "\n\n" +
-		"Buat storyboard untuk membuat video iklan promosi produk dengan detail produk di atas. Buat narasi iklan yang menarik, dengan masing-masing perkiraan durasi 10 detik. Tambahkan judul ilustrasi gambar yang cocok. Gunakan format output sebagai berikut masing-masing dalam satu baris tanpa poin.\nJudul Adegan:\nTeks Narasi Iklan:\nTeks Ilustrasi Gambar:"
+		"Buat storyboard untuk membuat video iklan promosi produk dengan detail produk di atas. Buat narasi iklan yang menarik, dengan masing-masing perkiraan durasi 10 detik. Tambahkan judul ilustrasi gambar yang cocok. Tuliskan masing-masing jawaban dalam satu baris dengan format output berikut\nJudul Adegan:\nTeks Narasi Iklan:\nTeks Ilustrasi Gambar:"
 }
 
 func Generate(req GenerateRequest) ([]Scene, *errors.Error) {
@@ -100,7 +102,7 @@ func parseScenes(result string) []Scene {
 			scenes[len(scenes)-1].Narration = strings.Replace(line, "Teks Narasi Iklan: ", "", 1)
 		} else if strings.HasPrefix(line, "Teks Ilustrasi Gambar: ") {
 			// TODO: trim
-			scenes[len(scenes)-1].Narration = strings.Replace(line, "Teks Ilustrasi Gambar: ", "", 1)
+			scenes[len(scenes)-1].Illustration = strings.Replace(line, "Teks Ilustrasi Gambar: ", "", 1)
 		}
 	}
 

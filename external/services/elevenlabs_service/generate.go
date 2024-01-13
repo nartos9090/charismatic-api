@@ -4,21 +4,31 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"go-api-echo/config"
+	"go-api-echo/internal/pkg/helpers/errors"
 	"io/ioutil"
 	"net/http"
+	"os"
+	"path/filepath"
+	"strconv"
+	"time"
 )
 
-func Generate(text string) string {
-	url := "https://api.elevenlabs.io/v1/text-to-speech/ZQe5CZNOzWyzPSCn5a3c"
+const VOIDE_ID = `ZQe5CZNOzWyzPSCn5a3c`
+
+const MODEL_ID = `eleven_multilingual_v1`
+
+func Generate(text string) (string, *errors.Error) {
+	url := "https://api.elevenlabs.io/v1/text-to-speech/" + VOIDE_ID
 
 	// Define the request payload
 	payload := map[string]interface{}{
-		`model_id`: `eleven_multilingual_v1`,
+		`model_id`: MODEL_ID,
 		`text`:     text,
 		`voice_settings`: map[string]interface{}{
-			"similarity_boost":  123,
-			"stability":         123,
-			"style":             123,
+			"similarity_boost":  1,
+			"stability":         1,
+			"style":             1,
 			"use_speaker_boost": true,
 		},
 	}
@@ -27,24 +37,41 @@ func Generate(text string) string {
 	payloadBytes, err := json.Marshal(payload)
 
 	if err != nil {
-		panic(err)
+		commonError := errors.InternalServerError
+		commonError.Message = `error creating payload`
+		return "", commonError
 	}
 
 	req, _ := http.NewRequest("POST", url, bytes.NewBuffer(payloadBytes))
 
-	req.Header.Add("Content-Type", "application/json")
+	req.Header.Add(`Accept`, `audio/mpeg`)
+	req.Header.Add(`xi-api-key`, config.GlobalEnv.ElevenLabsConf.ApiKey)
+	req.Header.Add(`Content-Type`, `application/json`)
 
 	res, _ := http.DefaultClient.Do(req)
 
 	defer res.Body.Close()
 	body, _ := ioutil.ReadAll(res.Body)
 
-	fmt.Println(res)
-	fmt.Println(string(body))
+	fileName := filepath.Join(`public/voice`, strconv.Itoa(int(time.Now().Unix()))+".mp3")
 
-	result, err := json.Marshal(body)
-	if err != nil {
-		return ``
+	// Create the folder if it doesn't exist
+	if err := os.MkdirAll(filepath.Dir(fileName), 0755); err != nil {
+		commonError := errors.InternalServerError
+		commonError.Message = `error creating directory`
+		return "", commonError
 	}
-	return string(result)
+
+	// Save the file locally
+	err = ioutil.WriteFile(fileName, body, 0755)
+	if err != nil {
+		fmt.Println(err)
+		commonError := errors.InternalServerError
+		commonError.Message = `error saving file`
+		return "", commonError
+	}
+
+	fmt.Println("Voice saved to", fileName)
+
+	return fileName, nil
 }

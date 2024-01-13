@@ -17,5 +17,7 @@ func InitServer(port string) {
 	routes := e.Group("/v1")
 	video_infra.VideoRoute(routes)
 
+	routes.Static("/public", "public")
+
 	e.Logger.Fatal(e.Start(port))
 }
