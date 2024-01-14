@@ -6,6 +6,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"go-api-echo/internal/pkg/db/mysql"
 	"go-api-echo/internal/pkg/helpers/helpers_errors"
+	"go-api-echo/internal/pkg/jwt"
 	"go-api-echo/internal/pkg/validator"
 	"go-api-echo/internal/services/copywriting/adapter"
 	"strconv"
@@ -16,10 +17,10 @@ func CopywritingRoute(g *echo.Group) {
 	defer fmt.Printf(":: route /copywriting-project created\n")
 
 	r.POST("/create-sync", func(c echo.Context) error {
-		//user := jwt.Authorize(c)
-		//if user == nil {
-		//	return nil
-		//}
+		user := jwt.Authorize(c)
+		if user == nil {
+			return nil
+		}
 
 		var req adapter.CreateCopywritingReq
 		_ = c.Bind(&req)
@@ -50,16 +51,16 @@ func CopywritingRoute(g *echo.Group) {
 			db:  db_mysql.Db,
 		}
 
-		resp := adapter.CreateCopywritingProjectSync(1, req, repo)
+		resp := adapter.CreateCopywritingProjectSync(user.ID, req, repo)
 
 		return c.JSON(resp.Status, resp)
 	})
 
 	r.GET("/detail/:id", func(c echo.Context) error {
-		//user := jwt.Authorize(c)
-		//if user == nil {
-		//	return nil
-		//}
+		user := jwt.Authorize(c)
+		if user == nil {
+			return nil
+		}
 
 		id, err := strconv.Atoi(c.Param("id"))
 		if err != nil {
@@ -74,16 +75,16 @@ func CopywritingRoute(g *echo.Group) {
 			db:  db_mysql.Db,
 		}
 
-		resp := adapter.GetCopywritingDetail(1, id, repo)
+		resp := adapter.GetCopywritingDetail(user.ID, id, repo)
 
 		return c.JSON(resp.Status, resp)
 	})
 
 	r.GET("/list", func(c echo.Context) error {
-		//user := jwt.Authorize(c)
-		//if user == nil {
-		//	return nil
-		//}
+		user := jwt.Authorize(c)
+		if user == nil {
+			return nil
+		}
 
 		repo := CopywritingProjectRepository{
 			ctx: context.Background(),
@@ -91,7 +92,7 @@ func CopywritingRoute(g *echo.Group) {
 		}
 
 		//resp := adapter.GetCopywritingList(user.ID, repo)
-		resp := adapter.GetCopywritingList(1, repo)
+		resp := adapter.GetCopywritingList(user.ID, repo)
 
 		return c.JSON(resp.Status, resp)
 	})

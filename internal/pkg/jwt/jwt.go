@@ -1,6 +1,7 @@
 package jwt
 
 import (
+	"fmt"
 	"go-api-echo/config"
 	errors "go-api-echo/internal/pkg/helpers/helpers_errors"
 	"log"
@@ -44,6 +45,7 @@ func GenerateJWT(data TokenData) (string, *errors.Error) {
 }
 
 func Authorize(c echo.Context, roles ...string) *JwtClaims {
+	fmt.Println(c.Get("user"))
 	user := c.Get("user").(*jwt.Token)
 	claims := user.Claims.(*JwtClaims)
 

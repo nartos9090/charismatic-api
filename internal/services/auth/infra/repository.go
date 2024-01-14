@@ -14,10 +14,10 @@ type AuthRepo struct {
 }
 
 func (r AuthRepo) GetUser(email string) (*adapter.User, *helpers_errors.Error) {
-	admin := adapter.User{}
+	user := adapter.User{}
 	err := r.db.GetContext(
 		r.ctx,
-		&admin,
+		&user,
 		`
 		SELECT
 			id,
@@ -25,7 +25,7 @@ func (r AuthRepo) GetUser(email string) (*adapter.User, *helpers_errors.Error) {
 			fullname,
 			passwd,
 			passwdSalt
-		FROM admins
+		FROM user
 		WHERE email = ?
 		`,
 		email,
@@ -37,7 +37,7 @@ func (r AuthRepo) GetUser(email string) (*adapter.User, *helpers_errors.Error) {
 		return nil, &sqlErr
 	}
 
-	return &admin, nil
+	return &user, nil
 }
 
 func (r AuthRepo) CreateUser(user *adapter.User) (*adapter.User, *helpers_errors.Error) {
