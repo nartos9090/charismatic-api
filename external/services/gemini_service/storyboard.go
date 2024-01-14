@@ -2,7 +2,6 @@ package gemini_service
 
 import (
 	"context"
-	"fmt"
 	"github.com/google/generative-ai-go/genai"
 	"go-api-echo/config"
 	"go-api-echo/internal/pkg/helpers/helpers_errors"
@@ -11,7 +10,7 @@ import (
 	"strings"
 )
 
-type GenerateRequest struct {
+type GenerateStoryboardRequest struct {
 	ProductTitle string `json:"product_title"`
 	BrandName    string `json:"brand_name"`
 	ProductType  string `json:"product_type"`
@@ -30,7 +29,7 @@ type Storyboard struct {
 	VoiceUrl        string `json:"voice_url"`
 }
 
-func generatePrompt(req GenerateRequest) string {
+func generateStoryboardPrompt(req GenerateStoryboardRequest) string {
 	return "Judul Produk: " + req.ProductTitle + "\n\n" +
 		"Nama Brand: " + req.BrandName + "\n\n" +
 		"Jenis Produk: " + req.ProductType + "\n\n" +
@@ -41,7 +40,7 @@ func generatePrompt(req GenerateRequest) string {
 		"Buat storyboard untuk membuat video iklan promosi produk dengan detail produk di atas. Buat narasi iklan yang menarik, dengan masing-masing perkiraan durasi 10 detik. Tambahkan judul ilustrasi gambar yang cocok. Tuliskan masing-masing jawaban dalam satu baris dengan format output berikut\nJudul Adegan:\nTeks Narasi Iklan:\nTeks Ilustrasi Gambar:"
 }
 
-func Generate(req GenerateRequest) ([]Storyboard, *helpers_errors.Error) {
+func GenerateStoryboard(req GenerateStoryboardRequest) ([]Storyboard, *helpers_errors.Error) {
 	ctx := context.Background()
 
 	client, err := genai.NewClient(ctx, option.WithAPIKey(config.GlobalEnv.GeminiConf.ApiKey))
@@ -55,7 +54,7 @@ func Generate(req GenerateRequest) ([]Storyboard, *helpers_errors.Error) {
 	defer client.Close()
 
 	model := client.GenerativeModel("gemini-pro")
-	resp, err := model.GenerateContent(ctx, genai.Text(generatePrompt(req)))
+	resp, err := model.GenerateContent(ctx, genai.Text(generateStoryboardPrompt(req)))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -66,22 +65,10 @@ func Generate(req GenerateRequest) ([]Storyboard, *helpers_errors.Error) {
 	print(text)
 
 	// TODO: fix error
-	return parseScenes(text), nil
+	return parseStoryboardScenes(text), nil
 }
 
-func parseResponse(resp *genai.GenerateContentResponse) (text string) {
-	for _, cand := range resp.Candidates {
-		if cand.Content != nil {
-			for _, part := range cand.Content.Parts {
-				text += fmt.Sprintf("%s", part)
-			}
-		}
-	}
-
-	return
-}
-
-func parseScenes(result string) []Storyboard {
+func parseStoryboardScenes(result string) []Storyboard {
 	lines := strings.Split(result, "\n")
 
 	var scenes []Storyboard

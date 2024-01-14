@@ -40,6 +40,30 @@ func VideoRoute(g *echo.Group) {
 		return c.JSON(resp.Status, resp)
 	})
 
+	r.POST("/generate-sync", func(c echo.Context) error {
+		user := jwt.Authorize(c)
+		if user == nil {
+			return nil
+		}
+
+		var req adapter.GenerateVideoReq
+		_ = c.Bind(&req)
+
+		if err := validator.Validate(req); err != nil {
+			resp := err.ToHttpRes()
+			return c.JSON(resp.Status, resp)
+		}
+
+		repo := VideoProjectRepo{
+			ctx: context.Background(),
+			db:  db_mysql.Db,
+		}
+
+		resp := adapter.AddVideoProjectSyncWithDetail(user.ID, req, repo)
+
+		return c.JSON(resp.Status, resp)
+	})
+
 	r.GET("/list", func(c echo.Context) error {
 		user := jwt.Authorize(c)
 		if user == nil {

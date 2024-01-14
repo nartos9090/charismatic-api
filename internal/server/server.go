@@ -3,6 +3,7 @@ package server
 import (
 	"fmt"
 	"github.com/labstack/echo/v4"
+	copywriting_infra "go-api-echo/internal/services/copywriting/infra"
 	video_infra "go-api-echo/internal/services/video/infra"
 	"net/http"
 )
@@ -16,6 +17,7 @@ func InitServer(port string) {
 
 	routes := e.Group("/v1")
 	video_infra.VideoRoute(routes)
+	copywriting_infra.CopywritingRoute(routes)
 
 	routes.Static("/public", "public")
 
