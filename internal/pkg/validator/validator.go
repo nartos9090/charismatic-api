@@ -2,7 +2,7 @@ package validator
 
 import (
 	"fmt"
-	errors "go-api-echo/internal/pkg/helpers/errors"
+	errors "go-api-echo/internal/pkg/helpers/helpers_errors"
 
 	"github.com/go-playground/validator"
 )

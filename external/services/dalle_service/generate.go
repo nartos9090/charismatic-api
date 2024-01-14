@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"go-api-echo/config"
-	"go-api-echo/internal/pkg/helpers/errors"
+	"go-api-echo/internal/pkg/helpers/helpers_errors"
 	"io"
 	"net/http"
 	"os"
@@ -27,7 +27,7 @@ type DALLEResponse struct {
 }
 
 // Generate function makes an API call to DALL-E 2, downloads the image, and saves it locally.
-func Generate(prompt string, size string) (string, *errors.Error) {
+func Generate(prompt string, size string) (string, *helpers_errors.Error) {
 	apiEndpoint := "https://api.openai.com/v1/images/generations"
 
 	// Define the request payload
@@ -41,7 +41,7 @@ func Generate(prompt string, size string) (string, *errors.Error) {
 	// Convert payload to JSON
 	payloadBytes, err := json.Marshal(payload)
 	if err != nil {
-		commonError := errors.InternalServerError
+		commonError := helpers_errors.InternalServerError
 		commonError.Message = `error creating payload`
 		return "", commonError
 	}
@@ -49,7 +49,7 @@ func Generate(prompt string, size string) (string, *errors.Error) {
 	// Make the API call
 	request, err := http.NewRequest(`POST`, apiEndpoint, bytes.NewBuffer(payloadBytes))
 	if err != nil {
-		commonError := errors.InternalServerError
+		commonError := helpers_errors.InternalServerError
 		commonError.Message = `error creating external client`
 		return "", commonError
 	}
@@ -60,7 +60,7 @@ func Generate(prompt string, size string) (string, *errors.Error) {
 	client := &http.Client{}
 	response, err := client.Do(request)
 	if err != nil {
-		commonError := errors.BadGatewayError
+		commonError := helpers_errors.BadGatewayError
 		commonError.Message = `error making external request`
 		return "", commonError
 	}
@@ -69,7 +69,7 @@ func Generate(prompt string, size string) (string, *errors.Error) {
 	// Check if the response status code is OK (200)
 
 	if response.StatusCode != http.StatusOK {
-		externalError := errors.BadGatewayError
+		externalError := helpers_errors.BadGatewayError
 		externalError.Message = `error on external request`
 		return "", externalError
 	}
@@ -77,7 +77,7 @@ func Generate(prompt string, size string) (string, *errors.Error) {
 	// Decode the response JSON
 	var dalleResponse DALLEResponse
 	if err := json.NewDecoder(response.Body).Decode(&dalleResponse); err != nil {
-		commonError := errors.InternalServerError
+		commonError := helpers_errors.InternalServerError
 		commonError.Message = `internal server error`
 		return "", commonError
 	}
@@ -88,7 +88,7 @@ func Generate(prompt string, size string) (string, *errors.Error) {
 	// Download and save the image locally
 	fileName := filepath.Join(FOLDER_PATH, strconv.Itoa(int(dalleResponse.Created))+`.png`)
 	if err := downloadImage(imageURL, fileName); err != nil {
-		commonError := errors.InternalServerError
+		commonError := helpers_errors.InternalServerError
 		commonError.Message = `internal server error`
 		return "", commonError
 	}

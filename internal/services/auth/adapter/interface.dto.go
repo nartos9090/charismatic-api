@@ -1,7 +1,8 @@
 package adapter
 
-import errors "go-api-echo/internal/pkg/helpers/errors"
+import errors "go-api-echo/internal/pkg/helpers/helpers_errors"
 
 type AuthRepoInterface interface {
-	GetAdminProfile(email string) (*Admin, *errors.Error)
+	GetUser(email string) (*User, *errors.Error)
+	CreateUser(user *User) (*User, *errors.Error)
 }

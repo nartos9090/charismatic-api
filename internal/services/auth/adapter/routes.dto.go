@@ -8,6 +8,14 @@ type (
 		Password string `form:"password" validate:"required"`
 	}
 
+	LoginGoogleByAccessTokenReq struct {
+		AccessToken string `json:"access_token" validate:"required"`
+	}
+
+	LoginGoogleByIdTokenReq struct {
+		IdToken string `json:"id_token" validate:"required"`
+	}
+
 	LoginRes struct {
 		Token string `json:"token"`
 		jwt.TokenData

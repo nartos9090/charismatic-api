@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/google/generative-ai-go/genai"
 	"go-api-echo/config"
-	"go-api-echo/internal/pkg/helpers/errors"
+	"go-api-echo/internal/pkg/helpers/helpers_errors"
 	"google.golang.org/api/option"
 	"log"
 	"strings"
@@ -41,13 +41,13 @@ func generatePrompt(req GenerateRequest) string {
 		"Buat storyboard untuk membuat video iklan promosi produk dengan detail produk di atas. Buat narasi iklan yang menarik, dengan masing-masing perkiraan durasi 10 detik. Tambahkan judul ilustrasi gambar yang cocok. Tuliskan masing-masing jawaban dalam satu baris dengan format output berikut\nJudul Adegan:\nTeks Narasi Iklan:\nTeks Ilustrasi Gambar:"
 }
 
-func Generate(req GenerateRequest) ([]Scene, *errors.Error) {
+func Generate(req GenerateRequest) ([]Scene, *helpers_errors.Error) {
 	ctx := context.Background()
 
 	client, err := genai.NewClient(ctx, option.WithAPIKey(config.GlobalEnv.GeminiConf.ApiKey))
 
 	if err != nil {
-		commonErr := *errors.InternalServerError
+		commonErr := *helpers_errors.InternalServerError
 		commonErr.AddError("internal server error")
 		return nil, &commonErr
 	}

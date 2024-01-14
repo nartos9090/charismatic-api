@@ -2,7 +2,7 @@ package jwt
 
 import (
 	"go-api-echo/config"
-	errors "go-api-echo/internal/pkg/helpers/errors"
+	errors "go-api-echo/internal/pkg/helpers/helpers_errors"
 	"log"
 	"time"
 

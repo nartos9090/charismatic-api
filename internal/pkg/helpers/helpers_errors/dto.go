@@ -1,4 +1,4 @@
-package errors
+package helpers_errors
 
 type Error struct {
 	HttpCode int

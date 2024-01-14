@@ -4,7 +4,7 @@ import (
 	"math"
 	"reflect"
 
-	errors "go-api-echo/internal/pkg/helpers/errors"
+	errors "go-api-echo/internal/pkg/helpers/helpers_errors"
 )
 
 func RoundToNearestTenth(raw float64) (res float64) {

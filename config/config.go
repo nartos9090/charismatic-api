@@ -8,6 +8,14 @@ import (
 )
 
 type (
+	DBConf struct {
+		User   string
+		Pass   string
+		Host   string
+		Port   string
+		Schema string
+	}
+
 	GeminiConf struct {
 		ApiKey string
 	}
@@ -20,13 +28,21 @@ type (
 		ApiKey string
 	}
 
+	Google struct {
+		ClientID     string
+		ClientSecret string
+	}
+
 	Env struct {
 		HttpPort  string
 		JWTSecret string
 
+		DB DBConf
+
 		GeminiConf     GeminiConf
 		ElevenLabsConf ElevenLabsConf
 		DalleConf      DalleConf
+		Google         Google
 	}
 )
 
@@ -49,6 +65,31 @@ func InitConfig() {
 		panic("JWT_SECRET env not set")
 	}
 
+	GlobalEnv.DB.User, ok = os.LookupEnv("DB_USER")
+	if !ok {
+		panic("DB_USER env not set")
+	}
+
+	GlobalEnv.DB.Pass, ok = os.LookupEnv("DB_PASS")
+	if !ok {
+		panic("DB_PASS env not set")
+	}
+
+	GlobalEnv.DB.Host, ok = os.LookupEnv("DB_HOST")
+	if !ok {
+		panic("DB_HOST env not set")
+	}
+
+	GlobalEnv.DB.Port, ok = os.LookupEnv("DB_PORT")
+	if !ok {
+		panic("DB_PORT env not set")
+	}
+
+	GlobalEnv.DB.Schema, ok = os.LookupEnv("DB_SCHEMA")
+	if !ok {
+		panic("DB_SCHEMA env not set")
+	}
+
 	GlobalEnv.ElevenLabsConf.ApiKey, ok = os.LookupEnv("ELEVENLABS_API_KEY")
 	if !ok {
 		panic("ELEVENLABS_API_KEY env not set")
@@ -62,5 +103,14 @@ func InitConfig() {
 	GlobalEnv.GeminiConf.ApiKey, ok = os.LookupEnv("GEMINI_API_KEY")
 	if !ok {
 		panic("GEMINI_API_KEY env not set")
+	}
+
+	GlobalEnv.Google.ClientID, ok = os.LookupEnv("GOOGLE_CLIENT_ID")
+	if !ok {
+		panic("GOOGLE_CLIENT_ID env not set")
+	}
+	GlobalEnv.Google.ClientSecret, ok = os.LookupEnv("GOOGLE_CLIENT_SECRET")
+	if !ok {
+		panic("GOOGLE_CLIENT_SECRET env not set")
 	}
 }

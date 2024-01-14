@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"go-api-echo/config"
-	"go-api-echo/internal/pkg/helpers/errors"
+	"go-api-echo/internal/pkg/helpers/helpers_errors"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -18,7 +18,7 @@ const VOIDE_ID = `ZQe5CZNOzWyzPSCn5a3c`
 
 const MODEL_ID = `eleven_multilingual_v1`
 
-func Generate(text string) (string, *errors.Error) {
+func Generate(text string) (string, *helpers_errors.Error) {
 	url := "https://api.elevenlabs.io/v1/text-to-speech/" + VOIDE_ID
 
 	// Define the request payload
@@ -37,7 +37,7 @@ func Generate(text string) (string, *errors.Error) {
 	payloadBytes, err := json.Marshal(payload)
 
 	if err != nil {
-		commonError := errors.InternalServerError
+		commonError := helpers_errors.InternalServerError
 		commonError.Message = `error creating payload`
 		return "", commonError
 	}
@@ -57,7 +57,7 @@ func Generate(text string) (string, *errors.Error) {
 
 	// Create the folder if it doesn't exist
 	if err := os.MkdirAll(filepath.Dir(fileName), 0755); err != nil {
-		commonError := errors.InternalServerError
+		commonError := helpers_errors.InternalServerError
 		commonError.Message = `error creating directory`
 		return "", commonError
 	}
@@ -66,7 +66,7 @@ func Generate(text string) (string, *errors.Error) {
 	err = ioutil.WriteFile(fileName, body, 0755)
 	if err != nil {
 		fmt.Println(err)
-		commonError := errors.InternalServerError
+		commonError := helpers_errors.InternalServerError
 		commonError.Message = `error saving file`
 		return "", commonError
 	}

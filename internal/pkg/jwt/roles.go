@@ -1,7 +1,7 @@
 package jwt
 
 import (
-	errors "go-api-echo/internal/pkg/helpers/errors"
+	errors "go-api-echo/internal/pkg/helpers/helpers_errors"
 )
 
 var RoleAdmin = "Admin"
