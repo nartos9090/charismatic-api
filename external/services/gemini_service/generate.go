@@ -20,7 +20,7 @@ type GenerateRequest struct {
 	Duration     int    `json:"duration"`
 }
 
-type Scene struct {
+type Storyboard struct {
 	Order           int    `json:"order"`
 	Title           string `json:"title"`
 	Narration       string `json:"narration"`
@@ -41,7 +41,7 @@ func generatePrompt(req GenerateRequest) string {
 		"Buat storyboard untuk membuat video iklan promosi produk dengan detail produk di atas. Buat narasi iklan yang menarik, dengan masing-masing perkiraan durasi 10 detik. Tambahkan judul ilustrasi gambar yang cocok. Tuliskan masing-masing jawaban dalam satu baris dengan format output berikut\nJudul Adegan:\nTeks Narasi Iklan:\nTeks Ilustrasi Gambar:"
 }
 
-func Generate(req GenerateRequest) ([]Scene, *helpers_errors.Error) {
+func Generate(req GenerateRequest) ([]Storyboard, *helpers_errors.Error) {
 	ctx := context.Background()
 
 	client, err := genai.NewClient(ctx, option.WithAPIKey(config.GlobalEnv.GeminiConf.ApiKey))
@@ -81,10 +81,10 @@ func parseResponse(resp *genai.GenerateContentResponse) (text string) {
 	return
 }
 
-func parseScenes(result string) []Scene {
+func parseScenes(result string) []Storyboard {
 	lines := strings.Split(result, "\n")
 
-	var scenes []Scene
+	var scenes []Storyboard
 
 	sceneNumber := 0
 
@@ -92,7 +92,7 @@ func parseScenes(result string) []Scene {
 		if strings.HasPrefix(line, "Judul Adegan: ") {
 			sceneNumber++
 			// TODO: trim
-			scene := Scene{
+			scene := Storyboard{
 				Order: sceneNumber,
 				Title: strings.Replace(line, "Judul Adegan: ", "", 1),
 			}
