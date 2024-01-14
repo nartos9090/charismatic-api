@@ -1,2 +1,8 @@
 .env
 .db
+
+public/images/*
+!public/images/.gitkeep
+
+public/voice/*
+!public/voice/.gitkeep
