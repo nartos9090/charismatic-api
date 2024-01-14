@@ -105,12 +105,12 @@ func InitConfig() {
 		panic("GEMINI_API_KEY env not set")
 	}
 
-	GlobalEnv.Google.ClientID, ok = os.LookupEnv("GOOGLE_CLIENT_ID")
-	if !ok {
-		panic("GOOGLE_CLIENT_ID env not set")
-	}
-	GlobalEnv.Google.ClientSecret, ok = os.LookupEnv("GOOGLE_CLIENT_SECRET")
-	if !ok {
-		panic("GOOGLE_CLIENT_SECRET env not set")
-	}
+	//GlobalEnv.Google.ClientID, ok = os.LookupEnv("GOOGLE_CLIENT_ID")
+	//if !ok {
+	//	panic("GOOGLE_CLIENT_ID env not set")
+	//}
+	//GlobalEnv.Google.ClientSecret, ok = os.LookupEnv("GOOGLE_CLIENT_SECRET")
+	//if !ok {
+	//	panic("GOOGLE_CLIENT_SECRET env not set")
+	//}
 }

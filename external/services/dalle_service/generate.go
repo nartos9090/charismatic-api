@@ -27,7 +27,7 @@ type DALLEResponse struct {
 }
 
 // Generate function makes an API call to DALL-E 2, downloads the image, and saves it locally.
-func Generate(prompt string, size string) (string, *helpers_errors.Error) {
+func Generate(prompt string, size string, iterate int) (string, *helpers_errors.Error) {
 	apiEndpoint := "https://api.openai.com/v1/images/generations"
 
 	// Define the request payload
@@ -66,7 +66,22 @@ func Generate(prompt string, size string) (string, *helpers_errors.Error) {
 	}
 	defer response.Body.Close()
 
-	// Check if the response status code is OK (200)
+	if response.StatusCode == http.StatusUnauthorized {
+		externalError := helpers_errors.BadGatewayError
+		externalError.Message = `error on external request (unauthorized)`
+		return "", externalError
+	}
+
+	if response.StatusCode == http.StatusTooManyRequests {
+		if iterate > 10 {
+			externalError := helpers_errors.BadGatewayError
+			externalError.Message = `error on external request (too many requests)`
+			return "", externalError
+		} else {
+			iterate++
+			return Generate(prompt, size, iterate)
+		}
+	}
 
 	if response.StatusCode != http.StatusOK {
 		externalError := helpers_errors.BadGatewayError

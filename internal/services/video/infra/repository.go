@@ -2,6 +2,7 @@ package infra
 
 import (
 	"context"
+	"fmt"
 	"github.com/jmoiron/sqlx"
 	errors "go-api-echo/internal/pkg/helpers/helpers_errors"
 	"go-api-echo/internal/services/video/adapter"
@@ -50,7 +51,12 @@ func (r VideoProjectRepo) CreateVideoProject(userID int, req *adapter.GenerateVi
 		return nil, &sqlErr
 	}
 
-	return r.GetVideoProject(int(projectID), userID)
+	createdProject, errs := r.GetVideoProject(int(projectID), userID)
+	if errs != nil {
+		return nil, errs
+	}
+
+	return createdProject, nil
 }
 
 func (r VideoProjectRepo) GetVideoProject(projectID, userID int) (*entity.VideoProject, *errors.Error) {
@@ -75,6 +81,7 @@ func (r VideoProjectRepo) GetVideoProject(projectID, userID int) (*entity.VideoP
 		userID,
 	)
 	if err != nil {
+		fmt.Println(err)
 		sqlErr := errors.FromSql(err)
 		sqlErr.AddError("error getting video project")
 

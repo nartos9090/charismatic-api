@@ -25,6 +25,32 @@ func AddVideoProject(userID int, req GenerateVideoReq, repo VideoProjectRepoInte
 	return
 }
 
+func GetVideoProjectList(userID int, repo VideoProjectRepoInterface) (resp response.HttpRes) {
+	projects, err := repo.GetVideoProjectList(userID)
+	if err != nil {
+		return err.ToHttpRes()
+	}
+
+	resp.Status = http.StatusOK
+	resp.Message = "data retrieved successfully"
+	resp.Data = projects
+
+	return
+}
+
+func GetVideoProjectDetail(userID, projectID int, repo VideoProjectRepoInterface) (resp response.HttpRes) {
+	project, err := repo.GetVideoProjectDetail(projectID, userID)
+	if err != nil {
+		return err.ToHttpRes()
+	}
+
+	resp.Status = http.StatusOK
+	resp.Message = "data retrieved successfully"
+	resp.Data = project
+
+	return
+}
+
 func GenerateVideo(projectID int, project entity.VideoProject, repo VideoProjectRepoInterface) {
 	storyboards, err := gemini_service.Generate(gemini_service.GenerateRequest{
 		ProductTitle: project.ProductTitle,
@@ -41,7 +67,8 @@ func GenerateVideo(projectID int, project entity.VideoProject, repo VideoProject
 	}
 
 	for i, storyboard := range storyboards {
-		go func(i int, storyboard gemini_service.Storyboard) {
+		// goroutine here
+		func(i int, storyboard gemini_service.Storyboard) {
 			sceneID, err := repo.CreateScene(projectID, &entity.Scene{
 				Sequence:        i + 1,
 				Title:           storyboard.Title,
@@ -59,33 +86,43 @@ func GenerateVideo(projectID int, project entity.VideoProject, repo VideoProject
 
 			log.Println("created scene (sceneID: ", sceneID, ")")
 
-			go func(sceneID int, storyBoard gemini_service.Storyboard) {
-				url, err := dalle_service.Generate(storyBoard.Illustration, dalle_service.GenerateSize1)
-				if err != nil {
-					log.Print(err.Message)
-					return
-				}
+			// goroutine here
+			//func(sceneID int, storyBoard gemini_service.Storyboard) {
+			illustrationUrl, err := dalle_service.Generate(storyboard.Illustration, dalle_service.GenerateSize1, 0)
+			if err != nil {
+				log.Print(err.Message)
+				return
+			}
 
-				log.Println("generated illustration (sceneID: ", sceneID, ")")
+			log.Println("generated illustration (sceneID: ", sceneID, ")")
 
-				repo.UpdateScene(sceneID, &entity.Scene{
-					IllustrationUrl: url,
-				})
-			}(sceneID, storyboard)
+			if err != nil {
+				log.Println("error update scene (sceneID: ", sceneID, ")")
+				log.Print(err.Message)
+				return
+			}
+			//}(sceneID, storyboard)
 
-			go func(sceneID int, storyBoard gemini_service.Storyboard) {
-				url, err := elevenlabs_service.Generate(storyBoard.Narration)
-				if err != nil {
-					log.Print(err.Message)
-					return
-				}
+			// goroutine here
+			//func(sceneID int, storyBoard gemini_service.Storyboard) {
+			voiceUrl, err := elevenlabs_service.Generate(storyboard.Narration)
+			if err != nil {
+				log.Print(err.Message)
+				return
+			}
 
-				log.Println("generated illustration (sceneID: ", sceneID, ")")
+			log.Println("generated voice (sceneID: ", sceneID, ")")
 
-				repo.UpdateScene(sceneID, &entity.Scene{
-					VoiceUrl: url,
-				})
-			}(sceneID, storyboard)
+			_, err = repo.UpdateScene(sceneID, &entity.Scene{
+				IllustrationUrl: illustrationUrl,
+				VoiceUrl:        voiceUrl,
+			})
+			if err != nil {
+				log.Println("error update scene (sceneID: ", sceneID, ")")
+				log.Print(err.Message)
+				return
+			}
+			//}(sceneID, storyboard)
 		}(i, storyboard)
 	}
 }
