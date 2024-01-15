@@ -10,6 +10,8 @@ import (
 	customjwt "go-api-echo/internal/pkg/jwt"
 	auth_infra "go-api-echo/internal/services/auth/infra"
 	copywriting_infra "go-api-echo/internal/services/copywriting/infra"
+	history_infra "go-api-echo/internal/services/history/infra"
+	productimage_infra "go-api-echo/internal/services/productimage/infra"
 	video_infra "go-api-echo/internal/services/video/infra"
 	"net/http"
 )
@@ -40,6 +42,8 @@ func InitServer(port string) {
 	private.Use(echojwt.WithConfig(jwtConfig))
 	video_infra.VideoRoute(private)
 	copywriting_infra.CopywritingRoute(private)
+	productimage_infra.ProductImageRoute(private)
+	history_infra.HistoryRoute(private)
 
 	routes.Static("/public", "public")
 

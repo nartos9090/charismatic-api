@@ -108,7 +108,7 @@ func GenerateVideo(projectID int, project entity.VideoProject, repo VideoProject
 
 			// goroutine here
 			//func(sceneID int, storyBoard gemini_service.Storyboard) {
-			illustrationUrl, err := dalle_service.Generate(storyboard.Illustration, dalle_service.GenerateSize1, 0)
+			illustrationUrl, err := dalle_service.GenerateIllustration(storyboard.Illustration, dalle_service.GenerateSize1, 0)
 			if err != nil {
 				log.Print(err.Message)
 				return

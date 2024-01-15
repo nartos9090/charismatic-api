@@ -6,18 +6,12 @@ import (
 	"fmt"
 	"go-api-echo/config"
 	"go-api-echo/internal/pkg/helpers/helpers_errors"
-	"io"
 	"net/http"
-	"os"
 	"path/filepath"
 	"strconv"
 )
 
 const FOLDER_PATH = `public/images`
-
-var GenerateSize1 = "256x256"
-var GenerateSize2 = "512x512"
-var GenerateSize3 = "1024x1024"
 
 type DALLEResponse struct {
 	Created int64 `json:"created"`
@@ -26,8 +20,8 @@ type DALLEResponse struct {
 	} `json:"data"`
 }
 
-// Generate function makes an API call to DALL-E 2, downloads the image, and saves it locally.
-func Generate(prompt string, size string, iterate int) (string, *helpers_errors.Error) {
+// GenerateIllustration function makes an API call to DALL-E 2, downloads the image, and saves it locally.
+func GenerateIllustration(prompt string, size string, iterate int) (string, *helpers_errors.Error) {
 	apiEndpoint := "https://api.openai.com/v1/images/generations"
 
 	// Define the request payload
@@ -79,7 +73,7 @@ func Generate(prompt string, size string, iterate int) (string, *helpers_errors.
 			return "", externalError
 		} else {
 			iterate++
-			return Generate(prompt, size, iterate)
+			return GenerateIllustration(prompt, size, iterate)
 		}
 	}
 
@@ -111,31 +105,4 @@ func Generate(prompt string, size string, iterate int) (string, *helpers_errors.
 	fmt.Println("Illustration saved to", fileName)
 
 	return fileName, nil
-}
-
-// downloadImage function downloads the image from the given URL and saves it locally.
-func downloadImage(url, fileName string) error {
-	response, err := http.Get(url)
-	if err != nil {
-		return err
-	}
-	defer response.Body.Close()
-
-	// Create the folder if it doesn't exist
-	if err := os.MkdirAll(filepath.Dir(fileName), 0755); err != nil {
-		return err
-	}
-
-	file, err := os.Create(fileName)
-	if err != nil {
-		return err
-	}
-	defer file.Close()
-
-	_, err = io.Copy(file, response.Body)
-	if err != nil {
-		return err
-	}
-
-	return nil
 }

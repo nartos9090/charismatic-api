@@ -59,6 +59,7 @@ func HandleGoogleLoginByAccessToken(req LoginGoogleByAccessTokenReq, repo AuthRe
 			user = &User{
 				Email:      userInfo.Email,
 				FullName:   userInfo.Name,
+				Picture:    &userInfo.Picture,
 				Provider:   `google`,
 				ProviderID: userInfo.Id,
 			}
@@ -84,6 +85,7 @@ func HandleGoogleLoginByAccessToken(req LoginGoogleByAccessTokenReq, repo AuthRe
 	resp.Data = LoginRes{
 		Token:     token,
 		TokenData: tokenData,
+		Picture:   user.Picture,
 	}
 	resp.Status = http.StatusOK
 	resp.Message = "login success"

@@ -13,7 +13,7 @@ func TestGenerate(t *testing.T) {
 	size := GenerateSize2
 	t.Logf("prompt: %s", prompt)
 
-	result, err := Generate(prompt, size, 0)
+	result, err := GenerateIllustration(prompt, size, 0)
 	if err != nil {
 		t.Errorf("error: %s", err.Message)
 		return

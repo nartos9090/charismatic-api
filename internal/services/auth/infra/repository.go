@@ -23,6 +23,7 @@ func (r AuthRepo) GetUser(email string) (*adapter.User, *helpers_errors.Error) {
 			id,
 			email,
 			fullname,
+			picture,
 			passwd,
 			passwdSalt
 		FROM user
@@ -47,14 +48,16 @@ func (r AuthRepo) CreateUser(user *adapter.User) (*adapter.User, *helpers_errors
 		INSERT INTO user (
 			email,
 			fullname,
+		    picture,
 			passwd,
 			passwdSalt,
 			provider,
 			provider_id
-		) VALUES (?, ?, ?, ?, ?, ?)
+		) VALUES (?, ?, ?, ?, ?, ?, ?)
 		`,
 		user.Email,
 		user.FullName,
+		user.Picture,
 		user.Password,
 		user.PasswordSalt,
 		user.Provider,
