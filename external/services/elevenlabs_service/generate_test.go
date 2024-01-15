@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-const API_KEY = `5f46ece46c6e2ca414fa561ad7e3b64c`
+const API_KEY = ``
 
 func TestGenerate(t *testing.T) {
 	config.GlobalEnv.ElevenLabsConf.ApiKey = API_KEY

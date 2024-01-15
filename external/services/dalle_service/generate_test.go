@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-const API_KEY = `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`
+const API_KEY = ``
 
 func TestGenerate(t *testing.T) {
 	config.GlobalEnv.DalleConf.ApiKey = API_KEY
