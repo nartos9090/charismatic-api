@@ -19,6 +19,7 @@ type (
 	LoginRes struct {
 		Token   string `json:"token"`
 		Picture string `json:"picture"`
+		Email   string `json:"email"`
 		jwt.TokenData
 	}
 )
