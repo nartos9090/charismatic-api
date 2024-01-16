@@ -21,6 +21,7 @@ CREATE TABLE `product_image`
 (
     `id`         int(11)      NOT NULL AUTO_INCREMENT,
     `user_id`    int(11)      NOT NULL,
+    `title`      varchar(255) NOT NULL,
     `mask_url`   varchar(255) NOT NULL,
     `image_url`  varchar(255) NOT NULL,
     `created_at` datetime     NOT NULL DEFAULT current_timestamp(),
@@ -28,7 +29,7 @@ CREATE TABLE `product_image`
     KEY `product_image_user_id_fk` (`user_id`),
     CONSTRAINT `product_image_user_id_fk` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`)
 ) ENGINE = InnoDB
-  AUTO_INCREMENT = 30
+  AUTO_INCREMENT = 32
   DEFAULT CHARSET = latin1
   COLLATE = latin1_swedish_ci;
 
@@ -43,7 +44,7 @@ CREATE TABLE `product_image_edited`
     KEY `product_image_edited_product_image_id_fk` (`product_image_id`),
     CONSTRAINT `product_image_edited_product_image_id_fk` FOREIGN KEY (`product_image_id`) REFERENCES `product_image` (`id`)
 ) ENGINE = InnoDB
-  AUTO_INCREMENT = 3
+  AUTO_INCREMENT = 6
   DEFAULT CHARSET = latin1
   COLLATE = latin1_swedish_ci;
 
@@ -79,7 +80,7 @@ CREATE TABLE `user`
     PRIMARY KEY (`id`),
     UNIQUE KEY `user_pk2` (`email`)
 ) ENGINE = InnoDB
-  AUTO_INCREMENT = 3
+  AUTO_INCREMENT = 4
   DEFAULT CHARSET = latin1
   COLLATE = latin1_swedish_ci;
 
