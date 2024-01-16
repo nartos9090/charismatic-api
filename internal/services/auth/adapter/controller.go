@@ -59,9 +59,60 @@ func HandleGoogleLoginByAccessToken(req LoginGoogleByAccessTokenReq, repo AuthRe
 			user = &User{
 				Email:      userInfo.Email,
 				FullName:   userInfo.Name,
-				Picture:    &userInfo.Picture,
+				Picture:    userInfo.Picture,
 				Provider:   `google`,
 				ProviderID: userInfo.Id,
+			}
+			user, err = repo.CreateUser(user)
+			if err != nil {
+				return err.ToHttpRes()
+			}
+		}
+		return err.ToHttpRes()
+	}
+
+	tokenData := jwt.TokenData{
+		ID:       user.ID,
+		FullName: user.FullName,
+		Role:     "user",
+	}
+
+	token, err := jwt.GenerateJWT(tokenData)
+	if err != nil {
+		return err.ToHttpRes()
+	}
+
+	resp.Data = LoginRes{
+		Token:     token,
+		TokenData: tokenData,
+		Picture:   user.Picture,
+	}
+	resp.Status = http.StatusOK
+	resp.Message = "login success"
+
+	return
+}
+
+func HandleGoogleLoginByIDToken(req LoginGoogleByIdTokenReq, repo AuthRepoInterface) (resp response.HttpRes) {
+	payload, err := googleauth_service.ValidateIdToken(req.IdToken)
+	if err != nil {
+		return err.ToHttpRes()
+	}
+
+	email := payload.Claims[`email`].(string)
+	name := payload.Claims[`name`].(string)
+	picture := payload.Claims[`picture`].(string)
+	id := payload.Claims[`sub`].(string)
+
+	user, err := repo.GetUser(email)
+	if err != nil {
+		if err.HttpCode == http.StatusNotFound {
+			user = &User{
+				Email:      email,
+				FullName:   name,
+				Picture:    picture,
+				Provider:   `google`,
+				ProviderID: id,
 			}
 			user, err = repo.CreateUser(user)
 			if err != nil {
