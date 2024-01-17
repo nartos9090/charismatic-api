@@ -66,7 +66,7 @@ func GenerateBackground(imagePath string, maskPath string, prompt string) (strin
 	}
 
 	// Add prompt to the request
-	writer.WriteField("prompt", prompt)
+	writer.WriteField("prompt", "replace background as "+prompt)
 	writer.WriteField("n", "1")
 	writer.WriteField("model", "dall-e-2")
 	writer.WriteField("size", GenerateSize3)
