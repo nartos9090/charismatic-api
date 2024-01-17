@@ -15,6 +15,7 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -65,7 +66,7 @@ func ProductImageRoute(g *echo.Group) {
 			return err
 		}
 
-		if imageFile.Header.Get("Content-Type") != "image/png" {
+		if strings.HasSuffix(imageFilename, ".jpg") || strings.HasSuffix(imageFilename, ".jpeg") {
 			imgBytes, err := os.ReadFile(imageFilename)
 			if err != nil {
 				comErr := *helpers_errors.BadRequestError
