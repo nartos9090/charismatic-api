@@ -75,7 +75,7 @@ func (r ProductImageRepository) GetGeneratedProductImage(userID, id int) (*entit
     				pie.image_url,
     				pie.prompt
 			FROM product_image_edited pie
-			LEFT JOIN charismatic_dev.product_image pi on pie.product_image_id = pi.id
+			LEFT JOIN product_image pi on pie.product_image_id = pi.id
 			WHERE pie.id = ?
 				AND pi.user_id = ?`,
 		id,
