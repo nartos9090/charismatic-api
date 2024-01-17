@@ -1,6 +1,7 @@
 package infra
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"github.com/labstack/echo/v4"
@@ -8,6 +9,8 @@ import (
 	"go-api-echo/internal/pkg/helpers/helpers_errors"
 	"go-api-echo/internal/pkg/jwt"
 	"go-api-echo/internal/services/productimage/adapter"
+	"image/jpeg"
+	"image/png"
 	"io"
 	"os"
 	"path/filepath"
@@ -49,7 +52,7 @@ func ProductImageRoute(g *echo.Group) {
 			return err
 		}
 
-		imageFilename := filepath.Join(uploadPath, strconv.Itoa(int(time.Now().Unix()))+"-"+imageFile.Filename+".png")
+		imageFilename := filepath.Join(uploadPath, strconv.Itoa(int(time.Now().Unix()))+"-"+imageFile.Filename)
 		dst, err := os.Create(imageFilename)
 		if err != nil {
 			comErr := *helpers_errors.BadRequestError
@@ -60,6 +63,50 @@ func ProductImageRoute(g *echo.Group) {
 
 		if _, err = io.Copy(dst, src); err != nil {
 			return err
+		}
+
+		fmt.Println(imageFile.Header.Get("Content-Type"))
+		if imageFile.Header.Get("Content-Type") == "image/jpeg" {
+			imgBytes, err := os.ReadFile(imageFilename)
+			if err != nil {
+				comErr := *helpers_errors.BadRequestError
+				comErr.AddError("invalid image")
+				resp := comErr.ToHttpRes()
+				return c.JSON(resp.Status, resp)
+			}
+
+			imageFilename = filepath.Join(uploadPath, strconv.Itoa(int(time.Now().Unix()))+"-"+imageFile.Filename+".png")
+			img, err := jpeg.Decode(bytes.NewReader(imgBytes))
+			if err != nil {
+				comErr := *helpers_errors.BadRequestError
+				comErr.AddError("invalid image")
+				resp := comErr.ToHttpRes()
+				return c.JSON(resp.Status, resp)
+			}
+
+			buf := new(bytes.Buffer)
+			err = png.Encode(buf, img)
+			if err != nil {
+				comErr := *helpers_errors.BadRequestError
+				comErr.AddError("invalid image")
+				resp := comErr.ToHttpRes()
+				return c.JSON(resp.Status, resp)
+			}
+
+			dst, err = os.Create(imageFilename)
+			if err != nil {
+				comErr := *helpers_errors.BadRequestError
+				comErr.AddError("invalid image")
+				resp := comErr.ToHttpRes()
+				return c.JSON(resp.Status, resp)
+			}
+
+			if _, err = io.Copy(dst, buf); err != nil {
+				comErr := *helpers_errors.BadRequestError
+				comErr.AddError("invalid image")
+				resp := comErr.ToHttpRes()
+				return c.JSON(resp.Status, resp)
+			}
 		}
 
 		maskFile, err := c.FormFile("mask")
