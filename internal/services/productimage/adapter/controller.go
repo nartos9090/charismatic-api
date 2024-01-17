@@ -33,7 +33,7 @@ func GenerateImageBackground(userID int, req GenerateBackgroundReq, repo Product
 		return err.ToHttpRes()
 	}
 
-	generatedImage, err := repo.CreateGeneratedProductImage(product.ID, AddGeneratedProductImageRepoReq{
+	generatedImage, err := repo.CreateGeneratedProductImage(userID, AddGeneratedProductImageRepoReq{
 		ImageUrl:       imageUrl,
 		Prompt:         req.Prompt,
 		ProductImageID: product.ID,
