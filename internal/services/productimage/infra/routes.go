@@ -65,8 +65,7 @@ func ProductImageRoute(g *echo.Group) {
 			return err
 		}
 
-		fmt.Println(imageFile.Header.Get("Content-Type"))
-		if imageFile.Header.Get("Content-Type") == "image/jpeg" {
+		if imageFile.Header.Get("Content-Type") != "image/png" {
 			imgBytes, err := os.ReadFile(imageFilename)
 			if err != nil {
 				comErr := *helpers_errors.BadRequestError
