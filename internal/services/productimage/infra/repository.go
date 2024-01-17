@@ -3,7 +3,6 @@ package infra
 import (
 	"context"
 	"github.com/jmoiron/sqlx"
-	"go-api-echo/config"
 	"go-api-echo/internal/pkg/helpers/helpers_errors"
 	"go-api-echo/internal/services/productimage/adapter"
 	"go-api-echo/internal/services/productimage/entity"
@@ -90,8 +89,6 @@ func (r ProductImageRepository) GetGeneratedProductImage(userID, id int) (*entit
 		return nil, &sqlErr
 	}
 
-	generated.ImageUrl = config.GlobalEnv.BaseURL + generated.ImageUrl
-
 	return &generated, nil
 }
 
@@ -121,7 +118,6 @@ func (r ProductImageRepository) GetGeneratedProductImageList(productID int) (*[]
 			sqlErr.AddError("failed to scan generated product image")
 			return nil, &sqlErr
 		}
-		product.ImageUrl = config.GlobalEnv.BaseURL + product.ImageUrl
 		generated = append(generated, product)
 	}
 
@@ -156,8 +152,6 @@ func (r ProductImageRepository) GetProductImageList(userID int) (*[]entity.Produ
 			sqlErr.AddError("failed to scan product image")
 			return nil, &sqlErr
 		}
-		product.ImageUrl = config.GlobalEnv.BaseURL + product.ImageUrl
-		product.MaskUrl = config.GlobalEnv.BaseURL + product.MaskUrl
 		products = append(products, product)
 	}
 
@@ -192,9 +186,6 @@ func (r ProductImageRepository) GetProductImage(userID, productID int) (*adapter
 	}
 
 	product.GeneratedImages = *generatedImages
-
-	product.ImageUrl = config.GlobalEnv.BaseURL + product.ImageUrl
-	product.MaskUrl = config.GlobalEnv.BaseURL + product.MaskUrl
 
 	return &product, nil
 }

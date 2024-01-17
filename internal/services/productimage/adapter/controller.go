@@ -1,6 +1,7 @@
 package adapter
 
 import (
+	"go-api-echo/config"
 	"go-api-echo/external/services/dalle_service"
 	"go-api-echo/internal/pkg/helpers/response"
 )
@@ -41,6 +42,8 @@ func GenerateImageBackground(userID int, req GenerateBackgroundReq, repo Product
 		return err.ToHttpRes()
 	}
 
+	generatedImage.ImageUrl = config.GlobalEnv.BaseURL + generatedImage.ImageUrl
+
 	return response.HttpRes{
 		Status:  200,
 		Message: "Success",
@@ -53,6 +56,13 @@ func GetProductImage(userID, productID int, repo ProductImageRepoInterface) (res
 	product, err := repo.GetProductImage(userID, productID)
 	if err != nil {
 		return err.ToHttpRes()
+	}
+
+	product.ImageUrl = config.GlobalEnv.BaseURL + product.ImageUrl
+	product.MaskUrl = config.GlobalEnv.BaseURL + product.MaskUrl
+
+	for i := 0; i < len(product.GeneratedImages); i++ {
+		product.GeneratedImages[i].ImageUrl = config.GlobalEnv.BaseURL + product.GeneratedImages[i].ImageUrl
 	}
 
 	return response.HttpRes{
@@ -69,6 +79,11 @@ func GetProductImageList(userID int, repo ProductImageRepoInterface) (resp respo
 		return err.ToHttpRes()
 	}
 
+	for i := 0; i < len(*products); i++ {
+		(*products)[i].ImageUrl = config.GlobalEnv.BaseURL + (*products)[i].ImageUrl
+		(*products)[i].MaskUrl = config.GlobalEnv.BaseURL + (*products)[i].MaskUrl
+	}
+
 	return response.HttpRes{
 		Status:  200,
 		Message: "Success",
@@ -82,6 +97,8 @@ func GetGeneratedProductImage(userID, generatedImageID int, repo ProductImageRep
 	if err != nil {
 		return err.ToHttpRes()
 	}
+
+	generatedImage.ImageUrl = config.GlobalEnv.BaseURL + generatedImage.ImageUrl
 
 	return response.HttpRes{
 		Status:  200,
