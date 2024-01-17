@@ -3,6 +3,7 @@ package infra
 import (
 	"context"
 	"github.com/jmoiron/sqlx"
+	"go-api-echo/config"
 	errors "go-api-echo/internal/pkg/helpers/helpers_errors"
 	"go-api-echo/internal/services/copywriting/adapter"
 	"go-api-echo/internal/services/copywriting/entity"
@@ -84,6 +85,7 @@ func (r CopywritingProjectRepository) GetLists(userID int) (*[]entity.Copywritin
 			sqlErr.AddError("error when scanning data")
 			return nil, &sqlErr
 		}
+		project.ProductImage = config.GlobalEnv.BaseURL + project.ProductImage
 		projects = append(projects, project)
 	}
 
@@ -112,6 +114,8 @@ func (r CopywritingProjectRepository) GetDetail(projectID int, userID int) (*ada
 		sqlErr := errors.FromSql(err)
 		return nil, &sqlErr
 	}
+
+	project.ProductImage = config.GlobalEnv.BaseURL + project.ProductImage
 
 	return &project, nil
 }

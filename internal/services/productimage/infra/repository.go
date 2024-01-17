@@ -2,8 +2,8 @@ package infra
 
 import (
 	"context"
-	"fmt"
 	"github.com/jmoiron/sqlx"
+	"go-api-echo/config"
 	"go-api-echo/internal/pkg/helpers/helpers_errors"
 	"go-api-echo/internal/services/productimage/adapter"
 	"go-api-echo/internal/services/productimage/entity"
@@ -44,7 +44,6 @@ func (r ProductImageRepository) CreateProductImage(userID int, product adapter.C
 	return int(productID), nil
 }
 func (r ProductImageRepository) CreateGeneratedProductImage(userID int, generated adapter.AddGeneratedProductImageRepoReq) (*entity.ProductImageGenerated, *helpers_errors.Error) {
-	fmt.Println(generated)
 	res, err := r.db.ExecContext(
 		r.ctx,
 		"INSERT INTO product_image_edited (product_image_id, image_url, prompt) VALUES (?, ?, ?)",
@@ -65,20 +64,23 @@ func (r ProductImageRepository) CreateGeneratedProductImage(userID int, generate
 		return nil, &sqlErr
 	}
 
-	return r.GetGeneratedProductImage(int(generatedID))
+	return r.GetGeneratedProductImage(userID, int(generatedID))
 }
 
-func (r ProductImageRepository) GetGeneratedProductImage(id int) (*entity.ProductImageGenerated, *helpers_errors.Error) {
+func (r ProductImageRepository) GetGeneratedProductImage(userID, id int) (*entity.ProductImageGenerated, *helpers_errors.Error) {
 	var generated entity.ProductImageGenerated
 	row := r.db.QueryRowx(
 		`SELECT
-    				id,
-    				product_image_id,
-    				image_url,
-    				prompt
-			FROM product_image_edited
-			WHERE id = ?`,
+    				pie.id,
+    				pie.product_image_id,
+    				pie.image_url,
+    				pie.prompt
+			FROM product_image_edited pie
+			LEFT JOIN charismatic_dev.product_image pi on pie.product_image_id = pi.id
+			WHERE pie.id = ?
+				AND pi.user_id = ?`,
 		id,
+		userID,
 	)
 
 	err := row.StructScan(&generated)
@@ -87,6 +89,8 @@ func (r ProductImageRepository) GetGeneratedProductImage(id int) (*entity.Produc
 		sqlErr.AddError("failed to get generated product image")
 		return nil, &sqlErr
 	}
+
+	generated.ImageUrl = config.GlobalEnv.BaseURL + generated.ImageUrl
 
 	return &generated, nil
 }
@@ -117,6 +121,7 @@ func (r ProductImageRepository) GetGeneratedProductImageList(productID int) (*[]
 			sqlErr.AddError("failed to scan generated product image")
 			return nil, &sqlErr
 		}
+		product.ImageUrl = config.GlobalEnv.BaseURL + product.ImageUrl
 		generated = append(generated, product)
 	}
 
@@ -151,6 +156,8 @@ func (r ProductImageRepository) GetProductImageList(userID int) (*[]entity.Produ
 			sqlErr.AddError("failed to scan product image")
 			return nil, &sqlErr
 		}
+		product.ImageUrl = config.GlobalEnv.BaseURL + product.ImageUrl
+		product.MaskUrl = config.GlobalEnv.BaseURL + product.MaskUrl
 		products = append(products, product)
 	}
 
@@ -183,7 +190,11 @@ func (r ProductImageRepository) GetProductImage(userID, productID int) (*adapter
 	if err != nil {
 		return nil, errs
 	}
+
 	product.GeneratedImages = *generatedImages
+
+	product.ImageUrl = config.GlobalEnv.BaseURL + product.ImageUrl
+	product.MaskUrl = config.GlobalEnv.BaseURL + product.MaskUrl
 
 	return &product, nil
 }

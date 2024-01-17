@@ -34,6 +34,7 @@ type (
 	}
 
 	Env struct {
+		BaseURL   string
 		HttpPort  string
 		JWTSecret string
 
@@ -54,6 +55,11 @@ func InitConfig() {
 	}
 
 	var ok bool
+
+	GlobalEnv.BaseURL, ok = os.LookupEnv("BASE_URL")
+	if !ok {
+		panic("BASE_URL env not set")
+	}
 
 	GlobalEnv.HttpPort, ok = os.LookupEnv("HTTP_PORT")
 	if !ok {

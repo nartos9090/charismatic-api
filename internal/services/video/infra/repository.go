@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/jmoiron/sqlx"
+	"go-api-echo/config"
 	errors "go-api-echo/internal/pkg/helpers/helpers_errors"
 	"go-api-echo/internal/services/video/adapter"
 	"go-api-echo/internal/services/video/entity"
@@ -147,6 +148,12 @@ func (r VideoProjectRepo) GetSceneList(projectID int) (*[]entity.Scene, *errors.
 		sqlErr.AddError("error getting scene list")
 
 		return nil, &sqlErr
+	}
+
+	for i := 0; i < len(scenes); i++ {
+		scene := &scenes[i]
+		scene.IllustrationUrl = config.GlobalEnv.BaseURL + scene.IllustrationUrl
+		scene.VoiceUrl = config.GlobalEnv.BaseURL + scene.VoiceUrl
 	}
 
 	return &scenes, nil

@@ -166,4 +166,28 @@ func ProductImageRoute(g *echo.Group) {
 
 		return c.JSON(resp.Status, resp)
 	})
+
+	r.GET("/generated/:id", func(c echo.Context) error {
+		user := jwt.Authorize(c)
+		if user == nil {
+			return nil
+		}
+
+		id, err := strconv.Atoi(c.Param("id"))
+		if err != nil {
+			comErr := *helpers_errors.BadRequestError
+			comErr.AddError("invalid id")
+			resp := comErr.ToHttpRes()
+			return c.JSON(resp.Status, resp)
+		}
+
+		repo := ProductImageRepository{
+			ctx: context.Background(),
+			db:  db_mysql.Db,
+		}
+
+		resp := adapter.GetGeneratedProductImage(user.ID, id, repo)
+
+		return c.JSON(resp.Status, resp)
+	})
 }

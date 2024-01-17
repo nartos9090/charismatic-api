@@ -76,3 +76,17 @@ func GetProductImageList(userID int, repo ProductImageRepoInterface) (resp respo
 		Errors:  nil,
 	}
 }
+
+func GetGeneratedProductImage(userID, generatedImageID int, repo ProductImageRepoInterface) (resp response.HttpRes) {
+	generatedImage, err := repo.GetGeneratedProductImage(userID, generatedImageID)
+	if err != nil {
+		return err.ToHttpRes()
+	}
+
+	return response.HttpRes{
+		Status:  200,
+		Message: "Success",
+		Data:    generatedImage,
+		Errors:  nil,
+	}
+}

@@ -23,6 +23,8 @@ func InitServer(port string) {
 		return c.String(http.StatusOK, "Echo API is running")
 	})
 
+	e.Static("/public", "public")
+
 	routes := e.Group("/v1")
 	auth_infra.AuthRoute(routes)
 
@@ -44,8 +46,6 @@ func InitServer(port string) {
 	copywriting_infra.CopywritingRoute(private)
 	productimage_infra.ProductImageRoute(private)
 	history_infra.HistoryRoute(private)
-
-	routes.Static("/public", "public")
 
 	e.Logger.Fatal(e.Start(port))
 }

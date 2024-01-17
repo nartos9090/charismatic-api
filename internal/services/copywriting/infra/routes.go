@@ -91,7 +91,6 @@ func CopywritingRoute(g *echo.Group) {
 			db:  db_mysql.Db,
 		}
 
-		//resp := adapter.GetCopywritingList(user.ID, repo)
 		resp := adapter.GetCopywritingList(user.ID, repo)
 
 		return c.JSON(resp.Status, resp)
