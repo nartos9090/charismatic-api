@@ -24,6 +24,8 @@ This projects separated in 3 different repositories. Backend, Web App, and Andro
 
 This repository is an API Service written in Go. It uses Gemini AI to generate video storyboard, elevenLabs to generate voice over, and Dall-E to generate storyboard illustration.
 
+Follow this link for the production works. [https://charismatic-api.niwabi.my.id](https://charismatic-api.niwabi.my.id)
+
 ## Requirements
 
 1. Mysql Database
