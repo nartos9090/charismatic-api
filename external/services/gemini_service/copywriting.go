@@ -22,7 +22,7 @@ type GenerateCopywritingRequest struct {
 func generateCopywritingPrompt(req GenerateCopywritingRequest) string {
 	return "Buatkan teks copywriting mengenai gambar di atas yang bernama " + req.BrandName +
 		" dengan target pasar " + req.MarketTarget +
-		" dengan maksimal 1000 huruf dan keunggulannya sebagai berikut. " + req.Superiority
+		" dengan maksimal 1000 huruf dan keunggulannya sebagai berikut tanpa emoji. " + req.Superiority
 }
 
 func GenerateCopywriting(req GenerateCopywritingRequest) (string, *helpers_errors.Error) {
