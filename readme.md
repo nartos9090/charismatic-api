@@ -14,42 +14,36 @@ Hipster - **Enrico Olivian Maricar**
 
 Hacker - **Widya Ardianto**
 
-## Progress
+## Description
 
-In this stage 2 of submission in Hackfest 2024, I made the main logic from the previous submitted sequence diagram.
+This projects separated in 3 different repositories. Backend, Web App, and Android Mobile App. See the repositories below.
 
-![img_6.png](img_6.png)
+1. [Backend](https://github.com/nartos9090/charismatic-api)
+2. [Web App](https://github.com/nartos9090/charismatic-web)
+3. [Android Mobile App](https://github.com/Waffle000/Charismatic)
 
 This repository is an API Service written in Go. It uses Gemini AI to generate video storyboard, elevenLabs to generate voice over, and Dall-E to generate storyboard illustration.
 
+Follow this link for the production works. [https://charismatic-api.niwabi.my.id](https://charismatic-api.niwabi.my.id)
+
+## Requirements
+
+1. Mysql Database
+2. Go Programming Language. Follow the instructions [here](https://go.dev/doc/install) to install.
+
 ## How to use
+
+Create ```.env``` file in the root folder. See the example below.
 
 Run the app
 
 ```go run main```
 
 By default, it will run in ```127.0.0.1:8000```.
-### Curl
 
-Request
-```
-curl --location 'http://localhost:8000/v1/video/generate' \
---header 'Content-Type: application/json' \
---data '{
-    "product_title": "AquaVita",
-    "brand_name": "PureFlow",
-    "product_type": "Air Mineral Murni",
-    "market_target": "Semua Usia dan Gaya Hidup Sehat",
-    "superiority": "Sumber Air Alamiah: AquaVita berasal dari mata air alamiah yang kaya mineral, memberikan keaslian dan kesegaran yang unik. \nProses Pemurnian Tinggi: Menggunakan teknologi canggih untuk menjaga kebersihan dan kemurnian air, memastikan kualitas terbaik untuk konsumen.\n Kemasan Ramah Lingkungan: Botol yang dapat didaur ulang dan ramah lingkungan, mendukung komitmen kami terhadap keberlanjutan. \nKandungan Mineral Optimal: Mengandung sejumlah mineral esensial untuk keseimbangan tubuh, memenuhi kebutuhan harian nutrisi Anda.\nRasa Alami: Tidak ada tambahan bahan kimia atau perasa buatan, AquaVita memberikan sensasi rasa alami air mineral segar.\nDesain Modern: Kemasan yang elegan dan praktis, cocok untuk gaya hidup aktif dan sibuk.\n Dukungan Kesehatan: Dengan konsumsi rutin, AquaVita membantu menjaga hidrasi optimal, mendukung fungsi organ, dan meningkatkan kesehatan secara keseluruhan.",
-    "duration": 60
-}'
-```
+## API Documentation
 
-### Postman
-
-Import this collection
-
-https://api.postman.com/collections/9208271-d4d7f745-d119-4bab-a565-4017d1dffbf4?access_key=PMAT-01HKZ9NRZMZE9Y2JAR95MAPD84
+Follow the link [https://documenter.getpostman.com/view/9208271/2s9YsRdVAT](https://documenter.getpostman.com/view/9208271/2s9YsRdVAT) to get the API Documentation.
 
 ### Testing environment
 
@@ -59,7 +53,9 @@ Create ```.env``` file in the root folder and fill with this configuration.
 HTTP_PORT=127.0.0.1:8000
 JWT_SECRET=qwerty123
 
-DALLE_API_KEY=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
-ELEVENLABS_API_KEY=https://elevenlabs.io/docs/api-reference/text-to-speech
-GEMINI_API_KEY=AIzaSyAmjtCr0NQusUrodsQp28YHXbjW62_HsYI
+DALLE_API_KEY=
+ELEVENLABS_API_KEY=
+GEMINI_API_KEY=
 ```
+
+*To prevent github guard check, the API KEY will be provided in the submission file.
