@@ -28,6 +28,10 @@ type (
 		ApiKey string
 	}
 
+	ClipdropConf struct {
+		ApiKey string
+	}
+
 	Google struct {
 		ClientID     string
 		ClientSecret string
@@ -43,6 +47,7 @@ type (
 		GeminiConf     GeminiConf
 		ElevenLabsConf ElevenLabsConf
 		DalleConf      DalleConf
+		ClipdropConf   ClipdropConf
 		Google         Google
 	}
 )
