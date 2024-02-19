@@ -116,6 +116,11 @@ func InitConfig() {
 		panic("GEMINI_API_KEY env not set")
 	}
 
+	GlobalEnv.ClipdropConf.ApiKey, ok = os.LookupEnv("CLIPDROP_API_KEY")
+	if !ok {
+		panic("CLIPDROP_API_KEY env not set")
+	}
+
 	//GlobalEnv.Google.ClientID, ok = os.LookupEnv("GOOGLE_CLIENT_ID")
 	//if !ok {
 	//	panic("GOOGLE_CLIENT_ID env not set")

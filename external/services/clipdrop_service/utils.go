@@ -1,4 +1,4 @@
-package cripdrop_service
+package clipdrop_service
 
 import (
 	"fmt"

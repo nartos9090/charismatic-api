@@ -22,7 +22,7 @@ CREATE TABLE `product_image`
     `id`         int(11)      NOT NULL AUTO_INCREMENT,
     `user_id`    int(11)      NOT NULL,
     `title`      varchar(255) NOT NULL,
-    `mask_url`   varchar(255) NOT NULL,
+    `mask_url`   varchar(255) NULL,
     `image_url`  varchar(255) NOT NULL,
     `created_at` datetime     NOT NULL DEFAULT current_timestamp(),
     PRIMARY KEY (`id`),

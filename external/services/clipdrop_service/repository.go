@@ -1,4 +1,4 @@
-package cripdrop_service
+package clipdrop_service
 
 import (
 	"bytes"
@@ -20,7 +20,7 @@ const ApiRemoveBackgroundEndpoint = `https://clipdrop-api.co/remove-background/v
 const ApiReplaceBackgroundEndpoint = `https://clipdrop-api.co/replace-background/v1`
 const FolderPath = `public/images`
 
-func (c *CripdropServiceInterface) RemoveBackground(imagePath string, maskPath string, prompt string) (string, *helpers_errors.Error) {
+func (c CripdropServiceInterface) RemoveBackground(imagePath string, maskPath string, prompt string) (string, *helpers_errors.Error) {
 	body := &bytes.Buffer{}
 	writer := multipart.NewWriter(body)
 
@@ -33,7 +33,7 @@ func (c *CripdropServiceInterface) RemoveBackground(imagePath string, maskPath s
 	}
 	defer imageFile.Close()
 
-	imagePart, err := writer.CreateFormFile("image_file", "image.jpg")
+	imagePart, err := writer.CreateFormFile("image_file", imagePath)
 	if err != nil {
 		commonError := helpers_errors.InternalServerError
 		commonError.Message = `error creating payload`
@@ -85,6 +85,7 @@ func (c *CripdropServiceInterface) RemoveBackground(imagePath string, maskPath s
 	}
 
 	if response.StatusCode != http.StatusOK {
+		fmt.Println(string(responseBody))
 		externalError := helpers_errors.BadGatewayError
 		externalError.Message = `error on external request`
 		return "", externalError
@@ -93,7 +94,7 @@ func (c *CripdropServiceInterface) RemoveBackground(imagePath string, maskPath s
 	return saveFileToFolder(responseBody)
 }
 
-func (c *CripdropServiceInterface) ReplaceBackground(imagePath string, maskPath string, prompt string) (string, *helpers_errors.Error) {
+func (c CripdropServiceInterface) ReplaceBackground(imagePath string, maskPath string, prompt string) (string, *helpers_errors.Error) {
 	body := &bytes.Buffer{}
 	writer := multipart.NewWriter(body)
 
@@ -160,7 +161,6 @@ func (c *CripdropServiceInterface) ReplaceBackground(imagePath string, maskPath 
 	}
 
 	if response.StatusCode != http.StatusOK {
-		fmt.Println(string(responseBody))
 		externalError := helpers_errors.BadGatewayError
 		externalError.Message = `error on external request`
 

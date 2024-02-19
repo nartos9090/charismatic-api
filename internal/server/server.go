@@ -21,8 +21,8 @@ func InitServer(port string) {
 	fmt.Printf(":: Perparing routes\n\n")
 	e := echo.New()
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins: []string{"http://localhost", "http://localhost", "https://charismatic.niwabi.my.id"},
-		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept},
+		AllowOrigins: []string{"*"},
+		AllowHeaders: []string{"*"},
 	}))
 
 	e.GET("/", func(c echo.Context) error {

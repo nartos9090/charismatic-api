@@ -1,34 +1,49 @@
 package adapter
 
 import (
+	"fmt"
 	"go-api-echo/config"
-	"go-api-echo/external/services/dalle_service"
+	"go-api-echo/external/services/background_removal"
+	"go-api-echo/external/services/background_replacer"
 	"go-api-echo/internal/pkg/helpers/response"
 )
 
-func CreateProductImage(userID int, req CreateProductImageReq, repo ProductImageRepoInterface) (resp response.HttpRes) {
-	productID, err := repo.CreateProductImage(userID, CreateProductImageRepoReq{
-		Title:    req.Title,
-		ImageUrl: req.BaseImage,
-		MaskUrl:  req.MaskImage,
-	})
+func CreateProductImage(userID int, req CreateProductImageReq, repo ProductImageRepoInterface, backgroundReplacerRepo background_replacer.BackgroundReplacerRepoInterface, backgroundRemoverRepo background_removal.BackgroundRemovalRepoInterface) (resp response.HttpRes) {
+	fmt.Println(":: CreateProductImage")
+	removedBackgroundImageUrl, err := backgroundRemoverRepo.RemoveBackground(req.BaseImage, req.MaskImage, req.Prompt)
 	if err != nil {
 		return err.ToHttpRes()
 	}
 
-	return GenerateImageBackground(userID, GenerateBackgroundReq{
-		Prompt:         req.Prompt,
-		ProductImageID: productID,
-	}, repo)
+	fmt.Println(":: removedBackgroundImageUrl", removedBackgroundImageUrl)
+	productID, err := repo.CreateProductImage(userID, CreateProductImageRepoReq{
+		Title:    req.Title,
+		ImageUrl: removedBackgroundImageUrl,
+		MaskUrl:  req.MaskImage,
+	})
+
+	if err != nil {
+		return err.ToHttpRes()
+	}
+
+	return GenerateImageBackground(
+		userID,
+		GenerateBackgroundReq{
+			Prompt:         req.Prompt,
+			ProductImageID: productID,
+		},
+		repo,
+		backgroundReplacerRepo,
+	)
 }
 
-func GenerateImageBackground(userID int, req GenerateBackgroundReq, repo ProductImageRepoInterface) (resp response.HttpRes) {
+func GenerateImageBackground(userID int, req GenerateBackgroundReq, repo ProductImageRepoInterface, backgroundReplacerRepo background_replacer.BackgroundReplacerRepoInterface) (resp response.HttpRes) {
 	product, err := repo.GetProductImage(userID, req.ProductImageID)
 	if err != nil {
 		return err.ToHttpRes()
 	}
 
-	imageUrl, err := dalle_service.GenerateBackground(product.ImageUrl, product.MaskUrl, req.Prompt)
+	imageUrl, err := backgroundReplacerRepo.ReplaceBackground(product.ImageUrl, product.MaskUrl, req.Prompt)
 	if err != nil {
 		return err.ToHttpRes()
 	}

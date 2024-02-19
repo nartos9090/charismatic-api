@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/labstack/echo/v4"
+	"go-api-echo/external/services/clipdrop_service"
 	"go-api-echo/internal/pkg/db/mysql"
 	"go-api-echo/internal/pkg/helpers/helpers_errors"
 	"go-api-echo/internal/pkg/jwt"
@@ -28,6 +29,9 @@ func ProductImageRoute(g *echo.Group) {
 		if user == nil {
 			return nil
 		}
+
+		var req adapter.CreateProductImageReq
+		_ = c.Bind(&req)
 
 		imageFile, err := c.FormFile("image")
 		if err != nil {
@@ -75,7 +79,7 @@ func ProductImageRoute(g *echo.Group) {
 				return c.JSON(resp.Status, resp)
 			}
 
-			imageFilename = filepath.Join(uploadPath, strconv.Itoa(int(time.Now().Unix()))+"-"+imageFile.Filename+".png")
+			imageFilename = filepath.Join(uploadPath, strconv.Itoa(int(time.Now().Unix()))+"-"+imageFile.Filename)
 			img, err := jpeg.Decode(bytes.NewReader(imgBytes))
 			if err != nil {
 				comErr := *helpers_errors.BadRequestError
@@ -109,49 +113,52 @@ func ProductImageRoute(g *echo.Group) {
 			}
 		}
 
+		req.BaseImage = imageFilename
+
 		maskFile, err := c.FormFile("mask")
-		if err != nil {
-			comErr := *helpers_errors.BadRequestError
-			comErr.AddError("invalid mask")
-			resp := comErr.ToHttpRes()
-			return c.JSON(resp.Status, resp)
-		}
+		if maskFile != nil {
+			if err != nil {
+				comErr := *helpers_errors.BadRequestError
+				comErr.AddError("invalid mask")
+				resp := comErr.ToHttpRes()
+				return c.JSON(resp.Status, resp)
+			}
 
-		// Open the maskFile
-		src, err = maskFile.Open()
-		if err != nil {
-			comErr := *helpers_errors.BadRequestError
-			comErr.AddError("invalid mask")
-			resp := comErr.ToHttpRes()
-			return c.JSON(resp.Status, resp)
-		}
+			// Open the maskFile
+			src, err = maskFile.Open()
+			if err != nil {
+				comErr := *helpers_errors.BadRequestError
+				comErr.AddError("invalid mask")
+				resp := comErr.ToHttpRes()
+				return c.JSON(resp.Status, resp)
+			}
 
-		maskFilename := filepath.Join(uploadPath, strconv.Itoa(int(time.Now().Unix()))+"-"+maskFile.Filename+".png")
-		dst, err = os.Create(maskFilename)
-		if err != nil {
-			comErr := *helpers_errors.BadRequestError
-			comErr.AddError("invalid mask")
-			resp := comErr.ToHttpRes()
-			return c.JSON(resp.Status, resp)
-		}
+			maskFilename := filepath.Join(uploadPath, strconv.Itoa(int(time.Now().Unix()))+"-"+maskFile.Filename+".png")
+			dst, err = os.Create(maskFilename)
+			if err != nil {
+				comErr := *helpers_errors.BadRequestError
+				comErr.AddError("invalid mask")
+				resp := comErr.ToHttpRes()
+				return c.JSON(resp.Status, resp)
+			}
 
-		if _, err = io.Copy(dst, src); err != nil {
-			return err
-		}
+			if _, err = io.Copy(dst, src); err != nil {
+				return err
+			}
 
-		defer dst.Close()
+			defer dst.Close()
+
+			req.MaskImage = maskFilename
+		}
 
 		repo := ProductImageRepository{
 			ctx: context.Background(),
 			db:  db_mysql.Db,
 		}
 
-		var req adapter.CreateProductImageReq
-		_ = c.Bind(&req)
-		req.BaseImage = imageFilename
-		req.MaskImage = maskFilename
+		clipdropRepo := clipdrop_service.CripdropServiceInterface{}
 
-		resp := adapter.CreateProductImage(user.ID, req, repo)
+		resp := adapter.CreateProductImage(user.ID, req, repo, clipdropRepo, clipdropRepo)
 		return c.JSON(resp.Status, resp)
 	})
 
@@ -209,7 +216,9 @@ func ProductImageRoute(g *echo.Group) {
 			db:  db_mysql.Db,
 		}
 
-		resp := adapter.GenerateImageBackground(user.ID, req, repo)
+		backgroundReplacerRepo := clipdrop_service.CripdropServiceInterface{}
+
+		resp := adapter.GenerateImageBackground(user.ID, req, repo, backgroundReplacerRepo)
 
 		return c.JSON(resp.Status, resp)
 	})
