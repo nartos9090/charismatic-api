@@ -25,21 +25,21 @@ func CopywritingRoute(g *echo.Group) {
 		var req adapter.CreateCopywritingReq
 		_ = c.Bind(&req)
 
-		file, err := c.FormFile("product_image")
-		if err != nil {
-			comErr := helpers_errors.BadRequestError
-			comErr.AddError("invalid product_image")
-			resp := comErr.ToHttpRes()
-			return c.JSON(resp.Status, resp)
-		}
-
-		req.ProductImage, err = file.Open()
-		if err != nil {
-			comErr := helpers_errors.BadRequestError
-			comErr.AddError("invalid product_image")
-			resp := comErr.ToHttpRes()
-			return c.JSON(resp.Status, resp)
-		}
+		//file, err := c.FormFile("product_image")
+		//if err != nil {
+		//	comErr := helpers_errors.BadRequestError
+		//	comErr.AddError("invalid product_image")
+		//	resp := comErr.ToHttpRes()
+		//	return c.JSON(resp.Status, resp)
+		//}
+		//
+		//req.ProductImage, err = file.Open()
+		//if err != nil {
+		//	comErr := helpers_errors.BadRequestError
+		//	comErr.AddError("invalid product_image")
+		//	resp := comErr.ToHttpRes()
+		//	return c.JSON(resp.Status, resp)
+		//}
 
 		if err := validator.Validate(req); err != nil {
 			resp := err.ToHttpRes()

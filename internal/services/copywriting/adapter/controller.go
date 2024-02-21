@@ -9,7 +9,7 @@ import (
 
 func CreateCopywritingProjectSync(userID int, req CreateCopywritingReq, repo CopywritingProjectRepoInterface) (resp response.HttpRes) {
 	result, err := gemini_service.GenerateCopywriting(gemini_service.GenerateCopywritingRequest{
-		ProductImage: req.ProductImage,
+		//ProductImage: req.ProductImage,
 		BrandName:    req.BrandName,
 		MarketTarget: req.MarketTarget,
 		Superiority:  req.Superiority,
