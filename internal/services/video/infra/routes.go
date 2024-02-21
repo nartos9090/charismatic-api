@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/labstack/echo/v4"
+	"go-api-echo/external/services/dalle_service"
 	"go-api-echo/internal/pkg/db/mysql"
 	"go-api-echo/internal/pkg/helpers/helpers_errors"
 	"go-api-echo/internal/pkg/jwt"
@@ -35,7 +36,12 @@ func VideoRoute(g *echo.Group) {
 			db:  db_mysql.Db,
 		}
 
-		resp := adapter.AddVideoProject(user.ID, req, repo)
+		textToImageRepo := dalle_service.DallEServiceInterface{
+			Model: "dall-e-3",
+			Size:  dalle_service.GenerateSize1,
+		}
+
+		resp := adapter.AddVideoProject(user.ID, req, repo, textToImageRepo)
 
 		return c.JSON(resp.Status, resp)
 	})
@@ -59,7 +65,12 @@ func VideoRoute(g *echo.Group) {
 			db:  db_mysql.Db,
 		}
 
-		resp := adapter.AddVideoProjectSyncWithDetail(user.ID, req, repo)
+		textToImageRepo := dalle_service.DallEServiceInterface{
+			Model: "dall-e-3",
+			Size:  dalle_service.GenerateSize1,
+		}
+
+		resp := adapter.AddVideoProjectSyncWithDetail(user.ID, req, repo, textToImageRepo)
 
 		return c.JSON(resp.Status, resp)
 	})

@@ -16,3 +16,14 @@ func parseResponse(resp *genai.GenerateContentResponse) (text string) {
 
 	return
 }
+
+type Response struct {
+	Candidates []struct {
+		Content struct {
+			Parts []struct {
+				Text string `json:"text"`
+			} `json:"parts"`
+			Role string `json:"role"`
+		} `json:"content"`
+	} `json:"candidates"`
+}

@@ -20,13 +20,24 @@ type DALLEResponse struct {
 	} `json:"data"`
 }
 
+const MaxIterate = 10
+
+type DallEServiceInterface struct {
+	Model string
+	Size  string
+}
+
+func (c DallEServiceInterface) Generate(prompt string) (string, *helpers_errors.Error) {
+	return GenerateIllustration(prompt, c.Size, c.Model, 0)
+}
+
 // GenerateIllustration function makes an API call to DALL-E 2, downloads the image, and saves it locally.
-func GenerateIllustration(prompt string, size string, iterate int) (string, *helpers_errors.Error) {
+func GenerateIllustration(prompt string, size string, model string, iterate int) (string, *helpers_errors.Error) {
 	apiEndpoint := "https://api.openai.com/v1/images/generations"
 
 	// Define the request payload
 	payload := map[string]interface{}{
-		`model`:  `dall-e-2`,
+		`model`:  model,
 		`prompt`: prompt,
 		`n`:      1,
 		`size`:   size,
@@ -67,13 +78,13 @@ func GenerateIllustration(prompt string, size string, iterate int) (string, *hel
 	}
 
 	if response.StatusCode == http.StatusTooManyRequests {
-		if iterate > 10 {
+		if iterate > MaxIterate {
 			externalError := helpers_errors.BadGatewayError
 			externalError.Message = `error on external request (too many requests)`
 			return "", externalError
 		} else {
 			iterate++
-			return GenerateIllustration(prompt, size, iterate)
+			return GenerateIllustration(prompt, size, model, iterate)
 		}
 	}
 

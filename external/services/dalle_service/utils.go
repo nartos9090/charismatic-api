@@ -8,10 +8,6 @@ import (
 	"path/filepath"
 )
 
-var GenerateSize1 = "256x256"
-var GenerateSize2 = "512x512"
-var GenerateSize3 = "1024x1024"
-
 // downloadImage function downloads the image from the given URL and saves it locally.
 func downloadImage(url, fileName string) error {
 	response, err := http.Get(url)

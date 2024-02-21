@@ -1,12 +1,13 @@
 package gemini_service
 
 import (
-	"context"
-	"github.com/google/generative-ai-go/genai"
+	"bytes"
+	"encoding/json"
+	"fmt"
 	"go-api-echo/config"
 	"go-api-echo/internal/pkg/helpers/helpers_errors"
-	"google.golang.org/api/option"
-	"log"
+	"io/ioutil"
+	"net/http"
 	"strings"
 )
 
@@ -37,35 +38,88 @@ func generateStoryboardPrompt(req GenerateStoryboardRequest) string {
 		"Keunggulan: " + req.Superiority + "\n\n" +
 		// TODO: fix duration prompt
 		//"Duration: " + strconv.Itoa(int(req.Duration/10)) + "\n\n" +
-		"Buat storyboard untuk membuat video iklan promosi produk dengan detail produk di atas. Buat narasi iklan yang menarik, dengan masing-masing perkiraan durasi 10 detik. Tambahkan judul ilustrasi gambar yang cocok. Tuliskan masing-masing jawaban dalam satu baris dengan format output berikut\nJudul Adegan:\nTeks Narasi Iklan:\nTeks Ilustrasi Gambar:"
+		"Buat 5 storyboard untuk membuat video iklan promosi produk dengan detail produk di atas. Buat narasi iklan yang menarik, dengan masing-masing perkiraan durasi 10 detik. Tambahkan judul ilustrasi gambar yang cocok. Tuliskan masing-masing jawaban dalam satu baris dengan format output berikut\nJudul Adegan:\nTeks Narasi Iklan:\nTeks Ilustrasi Gambar:"
 }
 
 func GenerateStoryboard(req GenerateStoryboardRequest) ([]Storyboard, *helpers_errors.Error) {
-	ctx := context.Background()
+	url := "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.0-pro:generateContent?key=" + config.GlobalEnv.GeminiConf.ApiKey
 
-	client, err := genai.NewClient(ctx, option.WithAPIKey(config.GlobalEnv.GeminiConf.ApiKey))
+	payload := []byte(`{
+		"contents": [
+			{
+				"role": "user",
+				"parts": [
+					{
+						"text": "` + generateStoryboardPrompt(req) + `"
+					}
+				]
+			}
+		],
+		"generationConfig": {
+			"temperature": 0.9,
+			"topK": 1,
+			"topP": 1,
+			"maxOutputTokens": 2048,
+			"stopSequences": []
+		},
+		"safetySettings": [
+			{
+				"category": "HARM_CATEGORY_HARASSMENT",
+				"threshold": "BLOCK_MEDIUM_AND_ABOVE"
+			},
+			{
+				"category": "HARM_CATEGORY_HATE_SPEECH",
+				"threshold": "BLOCK_MEDIUM_AND_ABOVE"
+			},
+			{
+				"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+				"threshold": "BLOCK_MEDIUM_AND_ABOVE"
+			},
+			{
+				"category": "HARM_CATEGORY_DANGEROUS_CONTENT",
+				"threshold": "BLOCK_MEDIUM_AND_ABOVE"
+			}
+		]
+	}`)
 
+	httpReq, err := http.NewRequest("POST", url, bytes.NewBuffer(payload))
 	if err != nil {
 		commonErr := *helpers_errors.InternalServerError
-		commonErr.AddError("internal server error")
+		commonErr.AddError("error on external request")
 		return nil, &commonErr
 	}
 
-	defer client.Close()
+	httpReq.Header.Set("Content-Type", "application/json")
 
-	model := client.GenerativeModel("gemini-pro")
-	resp, err := model.GenerateContent(ctx, genai.Text(generateStoryboardPrompt(req)))
+	client := &http.Client{}
+	resp, err := client.Do(httpReq)
 	if err != nil {
-		log.Fatal(err)
+		commonErr := *helpers_errors.InternalServerError
+		commonErr.AddError("error on external request")
+		return nil, &commonErr
+	}
+	defer resp.Body.Close()
+
+	fmt.Println("HTTP Status Code:", resp.StatusCode)
+
+	// Read the response
+	responseBody, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		commonError := helpers_errors.InternalServerError
+		commonError.Message = `error reading external response`
+		return nil, commonError
 	}
 
-	text := parseResponse(resp)
-	text = strings.Replace(text, "**", "", -1)
-
-	print(text)
+	var response Response
+	err = json.Unmarshal([]byte(responseBody), &response)
+	if err != nil {
+		commonError := helpers_errors.InternalServerError
+		commonError.Message = `error unmarshalling external response`
+		return nil, commonError
+	}
 
 	// TODO: fix error
-	return parseStoryboardScenes(text), nil
+	return parseStoryboardScenes(response.Candidates[0].Content.Parts[0].Text), nil
 }
 
 func parseStoryboardScenes(result string) []Storyboard {

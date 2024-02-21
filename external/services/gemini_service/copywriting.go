@@ -1,14 +1,13 @@
 package gemini_service
 
 import (
-	"context"
-	"github.com/google/generative-ai-go/genai"
+	"bytes"
+	"encoding/json"
 	"go-api-echo/config"
 	"go-api-echo/internal/pkg/helpers/helpers_errors"
-	"google.golang.org/api/option"
-	"io"
-	"log"
+	"io/ioutil"
 	"mime/multipart"
+	"net/http"
 )
 
 type GenerateCopywritingRequest struct {
@@ -26,48 +25,79 @@ func generateCopywritingPrompt(req GenerateCopywritingRequest) string {
 }
 
 func GenerateCopywriting(req GenerateCopywritingRequest) (string, *helpers_errors.Error) {
-	ctx := context.Background()
-	client, err := genai.NewClient(ctx, option.WithAPIKey(config.GlobalEnv.GeminiConf.ApiKey))
+	url := "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.0-pro:generateContent?key=" + config.GlobalEnv.GeminiConf.ApiKey
+
+	payload := []byte(`{
+		"contents": [
+			{
+				"role": "user",
+				"parts": [
+					{
+						"text": "` + generateCopywritingPrompt(req) + `"
+					}
+				]
+			}
+		],
+		"generationConfig": {
+			"temperature": 0.9,
+			"topK": 1,
+			"topP": 1,
+			"maxOutputTokens": 2048,
+			"stopSequences": []
+		},
+		"safetySettings": [
+			{
+				"category": "HARM_CATEGORY_HARASSMENT",
+				"threshold": "BLOCK_MEDIUM_AND_ABOVE"
+			},
+			{
+				"category": "HARM_CATEGORY_HATE_SPEECH",
+				"threshold": "BLOCK_MEDIUM_AND_ABOVE"
+			},
+			{
+				"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+				"threshold": "BLOCK_MEDIUM_AND_ABOVE"
+			},
+			{
+				"category": "HARM_CATEGORY_DANGEROUS_CONTENT",
+				"threshold": "BLOCK_MEDIUM_AND_ABOVE"
+			}
+		]
+	}`)
+
+	httpReq, err := http.NewRequest("POST", url, bytes.NewBuffer(payload))
 	if err != nil {
-		log.Fatal(err)
-		comErr := *helpers_errors.InternalServerError
-		comErr.AddError("internal server error")
-		return "", &comErr
-	}
-	defer client.Close()
-
-	model := client.GenerativeModel("gemini-pro-vision")
-
-	// convert product image into byte
-	var fileBytes []byte
-
-	// Read the file content into a byte slice
-	buffer := make([]byte, 1024)
-	for {
-		n, err := req.ProductImage.Read(buffer)
-		if err == io.EOF {
-			break
-		}
-		if err != nil {
-			comErr := *helpers_errors.InternalServerError
-			comErr.AddError("internal server error")
-			return "", &comErr
-		}
-		fileBytes = append(fileBytes, buffer[:n]...)
+		commonErr := *helpers_errors.InternalServerError
+		commonErr.AddError("error on external request")
+		return ``, &commonErr
 	}
 
-	prompt := []genai.Part{
-		genai.ImageData("jpeg", fileBytes),
-		genai.Text(generateCopywritingPrompt(req)),
-	}
-	resp, err := model.GenerateContent(ctx, prompt...)
+	httpReq.Header.Set("Content-Type", "application/json")
 
+	client := &http.Client{}
+	resp, err := client.Do(httpReq)
 	if err != nil {
-		log.Fatal(err)
-		comErr := *helpers_errors.BadGatewayError
-		comErr.AddError("bad gateway")
-		return "", &comErr
+		commonErr := *helpers_errors.InternalServerError
+		commonErr.AddError("error on external request")
+		return ``, &commonErr
+	}
+	defer resp.Body.Close()
+
+	// Read the response
+	responseBody, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		commonError := helpers_errors.InternalServerError
+		commonError.Message = `error reading external response`
+		return "", commonError
 	}
 
-	return parseResponse(resp), nil
+	var response Response
+	err = json.Unmarshal([]byte(responseBody), &response)
+	if err != nil {
+		commonError := helpers_errors.InternalServerError
+		commonError.Message = `error unmarshalling external response`
+		return "", commonError
+	}
+
+	return response.Candidates[0].Content.Parts[0].Text, nil
 }

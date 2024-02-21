@@ -1,22 +1,22 @@
 package adapter
 
 import (
-	"go-api-echo/external/services/dalle_service"
 	"go-api-echo/external/services/elevenlabs_service"
 	"go-api-echo/external/services/gemini_service"
+	"go-api-echo/external/services/text_to_image"
 	"go-api-echo/internal/pkg/helpers/response"
 	"go-api-echo/internal/services/video/entity"
 	"log"
 	"net/http"
 )
 
-func AddVideoProject(userID int, req GenerateVideoReq, repo VideoProjectRepoInterface) (resp response.HttpRes) {
+func AddVideoProject(userID int, req GenerateVideoReq, repo VideoProjectRepoInterface, textToImageRepo text_to_image.TextToImageRepoInterface) (resp response.HttpRes) {
 	project, err := repo.CreateVideoProject(userID, &req)
 	if err != nil {
 		return err.ToHttpRes()
 	}
 
-	go GenerateVideo(project.ID, *project, repo)
+	go GenerateVideo(project.ID, *project, repo, textToImageRepo)
 
 	resp.Status = http.StatusOK
 	resp.Message = "data created successfully"
@@ -25,13 +25,13 @@ func AddVideoProject(userID int, req GenerateVideoReq, repo VideoProjectRepoInte
 	return
 }
 
-func AddVideoProjectSyncWithDetail(userID int, req GenerateVideoReq, repo VideoProjectRepoInterface) (resp response.HttpRes) {
+func AddVideoProjectSyncWithDetail(userID int, req GenerateVideoReq, repo VideoProjectRepoInterface, textToImageRepo text_to_image.TextToImageRepoInterface) (resp response.HttpRes) {
 	project, err := repo.CreateVideoProject(userID, &req)
 	if err != nil {
 		return err.ToHttpRes()
 	}
 
-	GenerateVideo(project.ID, *project, repo)
+	GenerateVideo(project.ID, *project, repo, textToImageRepo)
 
 	projectDetail, err := repo.GetVideoProjectDetail(project.ID, userID)
 	if err != nil {
@@ -71,7 +71,7 @@ func GetVideoProjectDetail(userID, projectID int, repo VideoProjectRepoInterface
 	return
 }
 
-func GenerateVideo(projectID int, project entity.VideoProject, repo VideoProjectRepoInterface) {
+func GenerateVideo(projectID int, project entity.VideoProject, repo VideoProjectRepoInterface, textToImageRepo text_to_image.TextToImageRepoInterface) {
 	storyboards, err := gemini_service.GenerateStoryboard(gemini_service.GenerateStoryboardRequest{
 		ProductTitle: project.ProductTitle,
 		BrandName:    project.BrandName,
@@ -108,7 +108,7 @@ func GenerateVideo(projectID int, project entity.VideoProject, repo VideoProject
 
 			// goroutine here
 			//func(sceneID int, storyBoard gemini_service.Storyboard) {
-			illustrationUrl, err := dalle_service.GenerateIllustration(storyboard.Illustration, dalle_service.GenerateSize1, 0)
+			illustrationUrl, err := textToImageRepo.Generate(storyboard.Illustration)
 			if err != nil {
 				log.Print(err.Message)
 				return
